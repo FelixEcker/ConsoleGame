@@ -131,7 +131,9 @@ public class Main {
                     World.removeTroop(attX, attY);
                 } else if (actionResult == ActionResult.TARGET_DIED) {
                     World.removeTroop(defX, defY);
-                    System.out.printf("You killed your target! Attacker is at %.2f%% health\n",
+                    troop.health += 0.04; // Award health for killing
+                    if (troop.health > 1.0f) troop.health = 1.0f; // Make sure troop hasnt got more than 1.0f health
+                    System.out.printf("You killed your target! Attacker is at %.2f%% health, your troop was awarded 4%% health back!\n",
                             troop.health*100);
                 }
 
@@ -153,6 +155,12 @@ public class Main {
                 } else {
                     System.out.println("No troop at those coordinates!");
                 }
+                break;
+            case "commands":
+                System.out.println("List of Commands:");
+                System.out.println("    move   <origin-coords>   <destination-coords> Move a troop");
+                System.out.println("    attack <attacker-coords> <defender-coords>    Attack another troop");
+                System.out.println("    troop  <troop-coords> Get Information about a troop");
                 break;
             default:
                 break;

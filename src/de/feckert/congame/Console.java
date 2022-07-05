@@ -18,7 +18,6 @@ public class Console {
 	 * Prints the map to console
 	 * */
 	public static void drawMap() {
-
 		// Assemble "header" which is just the column numbers
 		String headerLine1 = "  ";
 		String headerLine2 = "  ";
