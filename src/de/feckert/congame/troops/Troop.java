@@ -18,6 +18,9 @@ public abstract class Troop {
 	public int movementThisTurn = 0; // How far the troop can move in the current turn
 	public boolean waterTravel = false; // Sets if the troop can travel on water
 	public boolean canCapture = true; // Sets if the troop can capture a point
+	public boolean attacked = false; // Should be set to true once the troop attacked something, reset every round
+	public boolean pUsed = false; // True once primary action was used, reset every round
+	public boolean sUsed = false; // True once secondary action was used, reset every round
 
 	public Troop(boolean team) {
 		this.team = team;

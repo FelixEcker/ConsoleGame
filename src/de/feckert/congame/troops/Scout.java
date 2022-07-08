@@ -24,7 +24,7 @@ public class Scout extends Troop {
 			return ActionResult.FAILED;
 		}
 
-		target.health -= attackDmg;
+		target.health -= dealingDamage;
 		if (target.health <= 0) {
 			return ActionResult.TARGET_DIED;
 		} else {

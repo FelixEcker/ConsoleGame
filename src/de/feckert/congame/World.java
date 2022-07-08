@@ -22,22 +22,17 @@ public class World {
 	};
 
 	// -1 Not a CP ; 0 Enemy ; 1 Player ; 2 Uncaptured
-	public static int[][]     capturePoints;
+	public static CapturePoint[][]     capturePoints;
 	public static Troop[][]   troops;
 	
 	static {
 		troops        = new Troop[map.length][map[0].length];
-		capturePoints = new int[map.length][map[0].length];
+		capturePoints = new CapturePoint[map.length][map[0].length];
 	}
 	
 	public static void generate(int width, int height) {
 		// TODO: World Generation
-		for (int y = 0; y < height; y++) {
-			for (int x = 0; x < width; x++) {
-				capturePoints[y][x] = -1;
-			}
-		}
-		capturePoints[2][2] = 2;
+		capturePoints[2][2] = new CapturePoint(2, 1f, 1f, .3f);
 	}
 	
 	/**
