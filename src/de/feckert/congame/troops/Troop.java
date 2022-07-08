@@ -16,7 +16,8 @@ public abstract class Troop {
 	public char displayChar = '?';   // Character the troop should be displayed as
 	public int movement     = 0;     // How many tiles the troop can move in a turn
 	public int movementThisTurn = 0; // How far the troop can move in the current turn
-	public boolean waterTravel = false;
+	public boolean waterTravel = false; // Sets if the troop can travel on water
+	public boolean canCapture = true; // Sets if the troop can capture a point
 
 	public Troop(boolean team) {
 		this.team = team;

@@ -21,11 +21,44 @@ public class World {
 			{'#', '#', '#', '#', '~', '#', '#', '#', '#', '#', '#', '#'},
 	};
 
-	public static Troop[][] troops;
-
+	// -1 Not a CP ; 0 Enemy ; 1 Player ; 2 Uncaptured
+	public static int[][]     capturePoints;
+	public static Troop[][]   troops;
+	
 	static {
-		troops = new Troop[map.length][map[0].length];
+		troops        = new Troop[map.length][map[0].length];
+		capturePoints = new int[map.length][map[0].length];
 	}
+	
+	public static void generate(int width, int height) {
+		// TODO: World Generation
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
+				capturePoints[y][x] = -1;
+			}
+		}
+		capturePoints[2][2] = 2;
+	}
+	
+	/**
+	 * Checks if the given team has captured all points
+	 * */
+	public static boolean hasTeamWon(boolean team) {
+		int nTeam = team ? 1 : 0;
+		
+		for (int y = 0; y < capturePoints.length; y++) {
+			for (int x = 0; x < capturePoints[y].length; x++) {
+				if (nTeam != capturePoints[y][x] && capturePoints[y][x] > -1) return false;
+			}
+		}
+		
+		return true;
+	}
+	
+	public static boolean isFieldCP(int x, int y) {
+		return capturePoints[y][x] > -1;
+	}
+	
 
 	/**
 	 * Check if a troop is at specified Coordinates

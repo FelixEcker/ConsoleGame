@@ -1,6 +1,21 @@
 Scrap file for Game Ideas & Bugs
 
-Troops:
+Goal (?): Territory Control
+	- Capture n Points across the map
+	- First player to capture all points wins
+	- Troops can only be deployed to captured points
+
+Capture Points:
+	- Can defend themselves
+	- If Health is at 0%, they can be captured
+	- Capturing restores health to 30%, then they have to be repaired
+	- Repairing takes multiple turns
+	- Have 2 Sets of health
+		1. Defense
+		2. Core
+	- Once Defense Health is below 85% damage gets split 25% & 75% between core and defense
+
+Troops: (These values were chosen arbitrarily)
 Artillery
   - Attack Radius of 4
   - 12.5% damage

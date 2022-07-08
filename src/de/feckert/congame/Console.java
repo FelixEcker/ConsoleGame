@@ -37,11 +37,18 @@ public class Console {
 
 		// print map
 		for (int y = 0; y < World.map.length; y++) {
-			System.out.print((char) (65+y) + " ");
+			System.out.print((char) (65+y) + " "); // Print row char
 			for (int x = 0; x < World.map[y].length; x++) {
 				if (!World.troopAt(x,y)) {
-					System.out.print(ansiFormats.get(World.map[y][x]));
-					System.out.print(World.map[y][x]);
+					if (World.isFieldCP(y, x)) {
+						// Formatting, should make this look prettier some time
+						System.out.print(Ansi.RESET + (World.capturePoints[y][x] == 0 ? Ansi.RED_BACKGROUND :
+							World.capturePoints[y][x] == 1 ? Ansi.CYAN_BACKGROUND : Ansi.GREEN_BACKGROUND));
+						System.out.print("*");
+					} else {
+						System.out.print(ansiFormats.get(World.map[y][x]));
+						System.out.print(World.map[y][x]);
+					}
 				} else {
 					System.out.print(Ansi.YELLOW);
 					System.out.print(World.troop(x,y).team ? Ansi.CYAN_BACKGROUND : Ansi.RED_BACKGROUND);

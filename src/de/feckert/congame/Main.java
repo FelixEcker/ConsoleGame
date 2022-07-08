@@ -23,12 +23,14 @@ public class Main {
     // I attempted to use as little OOP shit as possible,
     // ideally the only use would be for Troops.
     public static void main(String[] args) {
+    	World.generate(12, 12);
+    	
         Scout s = new Scout(true); // Test Troop
         World.placeTroop(s, 0, 0);
 
         Scout s1 = new Scout(false);
-        //World.placeTroop(s1, 0, 1);
-
+        World.placeTroop(s1, 0, 1);
+        
         while (true) {
             World.updateTroops();
             System.out.println("====================");
@@ -65,13 +67,16 @@ public class Main {
                 playersTurn = false;
                 break;
             case "move":
-                int originX = Integer.parseInt(parameters[0].split(";")[0]);
-                int originY = ((byte) parameters[0].split(";")[1].toCharArray()[0]) - 65;
+            	int[] coords;
+            	coords = translateCoordinates(parameters[0]);
+                int originX = coords[0];
+                int originY = coords[1];
                 if (!World.troopAt(originX, originY)) {System.out.println("No troop at those coordinates!");}
                 Troop troop = World.troop(originX, originY);
 
-                int destX = Integer.parseInt(parameters[1].split(";")[0]);
-                int destY = ((byte) parameters[1].split(";")[1].toCharArray()[0]) - 65;
+            	coords = translateCoordinates(parameters[1]);
+                int destX = coords[0];
+                int destY = coords[1];
 
                 if (!troop.canTravelTo(originX, originY, destX, destY)) {
                     System.out.println("Distance too far for troop to move!");
@@ -94,8 +99,10 @@ public class Main {
                 break;
             case "attack": // Attacks
                 // Attacker
-                int attX = Integer.parseInt(parameters[0].split(";")[0]);
-                int attY = ((byte) parameters[0].split(";")[1].toCharArray()[0]) - 65;
+
+            	coords = translateCoordinates(parameters[0]);
+                int attX = coords[0];
+                int attY = coords[1];
                 if (!World.troopAt(attX, attY)) {System.out.println("No troop at "+parameters[0]);}
 
                 troop = World.troop(attX, attY);
@@ -104,8 +111,9 @@ public class Main {
                     return;
                 }
 
-                int defX = Integer.parseInt(parameters[1].split(";")[0]);
-                int defY = ((byte) parameters[1].split(";")[1].toCharArray()[0]) - 65;
+            	coords = translateCoordinates(parameters[1]);
+                int defX = coords[0];
+                int defY = coords[1];
                 if (!World.troopAt(defX, defY)) {System.out.println("No troop at "+parameters[1]);}
 
                 Troop defender = World.troop(defX, defY);
@@ -139,9 +147,38 @@ public class Main {
 
                 redrawMapPostAction = true;
                 break;
+            case "capture":
+            	coords = translateCoordinates(parameters[0]);
+            	int pX = coords[0];
+                int pY = coords[1];
+                if (!World.isFieldCP(pX, pY)) {
+                	System.out.println("That field is not a Capture Point!");
+                	return;
+                }
+
+            	coords = translateCoordinates(parameters[1]);
+                int x = coords[0];
+                int y = coords[1];
+                if (!World.troopAt(x,y)) {
+                	System.out.println("There is no troop at that location!");
+                }
+                troop = World.troop(x, y);
+                if (!troop.team || !troop.canCapture) {
+                	System.out.println("You cannot use this troop to capture!");
+                	return;
+                }
+                
+                if (troop.canTravelTo(x, y, pX, pY)) {
+                	// TODO: Capturing Logic
+                } else {
+                	System.out.println("The troop can't the travel to that Capture Point!");
+                }
+                
+            	break;
             case "troop": // Prints out information/stats of a troop at x,y coordinates
-                int x = Integer.parseInt(parameters[0].split(";")[0]);
-                int y = ((byte) parameters[0].split(";")[1].toCharArray()[0]) - 65;
+            	coords = translateCoordinates(parameters[0]);
+                x = coords[0];
+                y = coords[1];
                 if (World.troopAt(x, y)) {
                     troop = World.troop(x, y);
                     System.out.print(Console.Ansi.YELLOW_BACKGROUND);
@@ -165,6 +202,13 @@ public class Main {
             default:
                 break;
         }
+    }
+    
+    public static int[] translateCoordinates(String raw) {
+    	return new int[] {
+    			 Integer.parseInt(raw.split(";")[0]),
+                 ((byte) raw.split(";")[1].toCharArray()[0]) - 65
+    	};
     }
 
     public static boolean chooseYesNo() {
