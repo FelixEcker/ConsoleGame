@@ -16,6 +16,7 @@ Capture Points:
 		1. Defense
 		2. Core
 	- Once Defense Health is below 85% damage gets split 25% & 75% between core and defense
+	- Attack/Defense radius of 2 fields
 
 Troops: (These values were chosen arbitrarily)
 Artillery

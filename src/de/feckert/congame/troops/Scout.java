@@ -41,9 +41,7 @@ public class Scout extends Troop {
 
 	@Override
 	public void defend(Troop attacker) {
-		float dealingDamage = attackDmg-attacker.defDmgAbsorption;
-		if (dealingDamage <= 0) return;
-		attacker.health -= dealingDamage;
+		super.defend(attacker);
 	}
 
 	@Override

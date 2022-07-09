@@ -99,7 +99,6 @@ public class Main {
                 break;
             case "attack": // Attacks
                 // Attacker
-
             	coords = translateCoordinates(parameters[0]);
                 int attX = coords[0];
                 int attY = coords[1];
@@ -114,7 +113,14 @@ public class Main {
             	coords = translateCoordinates(parameters[1]);
                 int defX = coords[0];
                 int defY = coords[1];
-                if (!World.troopAt(defX, defY)) {System.out.println("No troop at "+parameters[1]);}
+                if (!World.troopAt(defX, defY)) {
+                	System.out.println("No troop or troop at "+parameters[1]);
+                	if (World.isFieldCP(defX, defY)) {
+                		attackCP(attX, attY, troop, defX, defY);
+                    	return;
+                	}
+                	return;
+                }
 
                 Troop defender = World.troop(defX, defY);
                 if (defender.team) {
@@ -122,27 +128,34 @@ public class Main {
                     return;
                 }
 
-                // Execute Attack
-                ActionResult actionResult = troop.attack(defender);
-
-                // Give attack information
-                if (actionResult == ActionResult.SUCCESS) {
+                // Execute Attack & Give attack information
+                switch (troop.attack(defender)) {
+                case SUCCESS:
                     System.out.printf("Successfully attacked! Attacker is at %.2f%% health, defender at %.2f%% health!\n",
                             troop.health*100, defender.health*100);
-                } else if (actionResult == ActionResult.FAILED) {
+                	break;
+                case FAILED:
                     System.out.printf("Attack failed! Your troop is now at %.2f%% health!\n", troop.health*100);
-                } else if (actionResult == ActionResult.INVALID) {
+                	break;
+                case INVALID:
                     System.out.println("This troop is incapable of attacking!");
-                } else if (actionResult == ActionResult.TROOP_DIED) {
+                	break;
+                case TROOP_DIED:
                     System.out.printf("Your troop died! Defender is at %.2f%% health\n",
                             defender.health*100);
                     World.removeTroop(attX, attY);
-                } else if (actionResult == ActionResult.TARGET_DIED) {
+                	break;
+                case TARGET_DIED:
                     World.removeTroop(defX, defY);
                     troop.health += 0.04; // Award health for killing
                     if (troop.health > 1.0f) troop.health = 1.0f; // Make sure troop hasnt got more than 1.0f health
                     System.out.printf("You killed your target! Attacker is at %.2f%% health, your troop was awarded 4%% health back!\n",
                             troop.health*100);
+                	break;
+				default:
+					System.err.println(Main.class.getClass().getName()+"#doAction (attack) switch statement defaulted! This wasn't supposed to happen!");
+					System.exit(-1);
+					break;
                 }
 
                 redrawMapPostAction = true;
@@ -202,6 +215,17 @@ public class Main {
             default:
                 break;
         }
+    }
+    
+    public static void attackCP(int attX, int attY, Troop attacker, int defX, int defY) {
+    	CapturePoint point = World.capturePoint(defX, defY);
+    	ActionResult result = attacker.attack(point);
+    	
+    	switch (result) {
+    	default:
+    		// TODO: WRITE CODE
+    		break;
+    	}
     }
     
     public static int[] translateCoordinates(String raw) {

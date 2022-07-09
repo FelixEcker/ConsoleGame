@@ -6,14 +6,19 @@ import de.feckert.congame.util.ActionResult;
 public class CapturePoint extends Troop {
 	public int owner;
 	public float defenseHealth;
+	public float defenseDmg;
+	public int x, y;
 	
-	public CapturePoint(int owner, float defenseHealth, float coreHealth, float damage) {
+	public CapturePoint(int owner, int x, int y, float damage) {
 		super(false);
 		this.owner = owner;
-		this.defenseHealth = defenseHealth;
-		this.health = coreHealth;
+		this.y = y;
+		this.defenseHealth = 1f;
+		this.health = 1f;
 		this.attackDmg = damage;
+		this.defenseDmg = damage/2;
 		this.movement = 0;
+		this.x = x;
 	}
 	
 	public void captured(int newOwner) {
@@ -22,8 +27,13 @@ public class CapturePoint extends Troop {
 		this.health = .3f;
 	}
 	
-	public void defend(Troop attacker) {
-		// TODO: defend code
+	public void defend(Troop attacker, int aX, int aY) {
+		if (movementDistance(x, y, aX, aY) <= 2) {
+			float dealingDamage = attackDmg-attacker.dmgAbsorption;
+			if (dealingDamage > 0) {
+				attacker.health -= attackDmg;
+			}
+		}
 	}
 	
 	public ActionResult attack(Troop target) {

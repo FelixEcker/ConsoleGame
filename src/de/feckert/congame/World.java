@@ -32,7 +32,7 @@ public class World {
 	
 	public static void generate(int width, int height) {
 		// TODO: World Generation
-		capturePoints[2][2] = new CapturePoint(2, 1f, 1f, .3f);
+		capturePoints[2][2] = new CapturePoint(2, 2, 2, .3f);
 	}
 	
 	/**
@@ -43,15 +43,19 @@ public class World {
 		
 		for (int y = 0; y < capturePoints.length; y++) {
 			for (int x = 0; x < capturePoints[y].length; x++) {
-				if (nTeam != capturePoints[y][x] && capturePoints[y][x] > -1) return false;
+				if (capturePoints[y][x] != null && capturePoints[y][x].owner != nTeam) return false;
 			}
 		}
 		
 		return true;
 	}
 	
+	public static CapturePoint capturePoint(int x, int y) {
+		return capturePoints[y][x];
+	}
+	
 	public static boolean isFieldCP(int x, int y) {
-		return capturePoints[y][x] > -1;
+		return capturePoints[y][x] == null;
 	}
 	
 

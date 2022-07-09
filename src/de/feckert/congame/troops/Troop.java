@@ -34,7 +34,11 @@ public abstract class Troop {
 		return ActionResult.INVALID;
 	}
 
-	public void defend(Troop attacker) {}
+	public void defend(Troop attacker) {
+		float dealingDamage = attackDmg-attacker.defDmgAbsorption;
+		if (dealingDamage <= 0) return;
+		attacker.health -= dealingDamage;
+	}
 
 	public ActionResult primaryAction() {
 		return ActionResult.INVALID;
