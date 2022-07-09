@@ -1,7 +1,9 @@
 package de.feckert.congame.troops;
 
+import de.feckert.congame.CapturePoint;
 import de.feckert.congame.World;
 import de.feckert.congame.util.ActionResult;
+import de.feckert.congame.util.Console;
 
 /**
  * Base Class for all Troops.
@@ -34,6 +36,38 @@ public abstract class Troop {
 		return ActionResult.INVALID;
 	}
 
+	// Attacking Capture Points takes different damage calculation, logic and return values
+	// Thus requires seperate method; The code for damage calculation and determining the ActionResult
+	// should remain the same in all cases, the method could be overriden for extra things on attack
+	// like inflicting certain effects on the capture points as part of the attack.
+	public ActionResult attackCP(CapturePoint target) {
+		float targetDHealth = target.defenseHealth;
+		float targetCHealth = target.health;
+		
+		if (targetDHealth <= .85) {
+			targetDHealth -= attackDmg*.75;
+			targetCHealth -= attackDmg*.25;
+		} else {
+			targetDHealth -= attackDmg;
+		}
+
+		if (targetDHealth < 0) targetDHealth = 0;
+		if (targetCHealth < 0) targetCHealth = 0;
+		
+		if (targetCHealth <= 0 && targetDHealth <= .05) {
+			return ActionResult.POINT_CAPTURABLE;
+		}
+		
+		Console.message("attack.cp_defends");
+		target.defend(this);
+		
+		if (health <= 0) {
+			return ActionResult.TROOP_DIED;
+		}
+		
+		return ActionResult.SUCCESS;
+	}
+	
 	public void defend(Troop attacker) {
 		float dealingDamage = attackDmg-attacker.defDmgAbsorption;
 		if (dealingDamage <= 0) return;
@@ -47,6 +81,10 @@ public abstract class Troop {
 	public ActionResult secondaryAction() {
 		return ActionResult.INVALID;
 	}
+	
+	public void update() {
+		movementThisTurn = movement;
+	}
 
 	// Contains some universal movement checks
 	public boolean canTravelTo(int originX, int originY, int destX, int destY) {
@@ -57,13 +95,7 @@ public abstract class Troop {
 		return true;
 	}
 
-	public void die() {}
-
 	public String toString() {
 		return ""+displayChar;
-	}
-
-	public void update() {
-		movementThisTurn = movement;
 	}
 }

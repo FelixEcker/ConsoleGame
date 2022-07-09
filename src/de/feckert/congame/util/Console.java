@@ -1,6 +1,8 @@
-package de.feckert.congame;
+package de.feckert.congame.util;
 
 import java.util.HashMap;
+
+import de.feckert.congame.World;
 
 public class Console {
 	public static HashMap<Character, String> ansiFormats = new HashMap<>();
@@ -42,8 +44,8 @@ public class Console {
 				if (!World.troopAt(x,y)) {
 					if (World.isFieldCP(y, x)) {
 						// Formatting, should make this look prettier some time
-						System.out.print(Ansi.RESET + (World.capturePoints[y][x].owner == 0 ? Ansi.RED_BACKGROUND :
-							World.capturePoints[y][x].owner == 1 ? Ansi.CYAN_BACKGROUND : Ansi.GREEN_BACKGROUND));
+						System.out.print(Ansi.RESET + (World.capturePoint(x, y).owner == 0 ? Ansi.RED_BACKGROUND :
+							World.capturePoint(x, y).owner == 1 ? Ansi.CYAN_BACKGROUND : Ansi.GREEN_BACKGROUND));
 						System.out.print("*");
 					} else {
 						System.out.print(ansiFormats.get(World.map[y][x]));

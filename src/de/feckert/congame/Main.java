@@ -3,6 +3,7 @@ package de.feckert.congame;
 import de.feckert.congame.troops.Scout;
 import de.feckert.congame.troops.Troop;
 import de.feckert.congame.util.ActionResult;
+import de.feckert.congame.util.Console;
 
 import java.util.Arrays;
 import java.util.Scanner;
@@ -98,6 +99,9 @@ public class Main {
                 }
                 break;
             case "attack": // Attacks
+            	// NOTE FOR ATTACKING CAPTURE POINTS: Attacking a CP should never capture them
+            	// to capture one, the "capture" action is to be used, which can intern attack
+            	// a capture point.
                 // Attacker
             	coords = translateCoordinates(parameters[0]);
                 int attX = coords[0];
@@ -219,11 +223,28 @@ public class Main {
     
     public static void attackCP(int attX, int attY, Troop attacker, int defX, int defY) {
     	CapturePoint point = World.capturePoint(defX, defY);
-    	ActionResult result = attacker.attack(point);
+    	ActionResult result = attacker.attackCP(point);
     	
     	switch (result) {
+    	case POINT_CAPTURABLE:
+    		System.out.println("You've sunken the Point's core health to 0% and its defense health below 5%, you can now capture it!");
+    		System.out.printf("Your troop is now at %.2f%% health!\n", attacker.health*100);
+    		break;
+    	case TROOP_DIED:
+            System.out.printf("Your troop died! Capture Point is at %.2f%% core health and %.2f%% defense health\n",
+                    point.health*100, point.defenseHealth*100);
+            World.removeTroop(attX, attY);
+    		break;
+    	case SUCCESS:
+            System.out.printf("The Capture Point is at %.2f%% core health and %.2f%% defense health\n",
+                    point.health*100, point.defenseHealth*100);
+    		System.out.printf("Your troop is now at %.2f%% health!\n", attacker.health*100);
+    		break;
     	default:
     		// TODO: WRITE CODE
+			System.err.println(Main.class.getClass().getName()+"#doAction -> "+
+    		Main.class.getClass().getName()+"#attackCP ActionResult message switch statement defaulted! This wasn't supposed to happen!");
+			System.exit(-1);
     		break;
     	}
     }

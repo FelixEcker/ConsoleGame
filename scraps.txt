@@ -9,14 +9,18 @@ Capture Points:
 	- Can defend themselves
 		- Meaning that if attacked, they have a defense turn
 		- They can also once per round attack nearby enemy troups
-	- If Health is at 0%, they can be captured
+	- If Health is at 0% and Defense below 5%, they can be captured
 	- Capturing restores health to 30%, then they have to be repaired
 	- Repairing takes multiple turns
 	- Have 2 Sets of health
 		1. Defense
 		2. Core
 	- Once Defense Health is below 85% damage gets split 25% & 75% between core and defense
+	- Defense Health replaces damage absorption
 	- Attack/Defense radius of 2 fields
+	- NOTE FOR ATTACKING CAPTURE POINTS: Attacking a CP should never capture them, 
+	  to capture one, the "capture" action is to be used, which can intern attack
+          a capture point.
 
 Troops: (These values were chosen arbitrarily)
 Artillery

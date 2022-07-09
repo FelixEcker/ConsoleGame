@@ -2,6 +2,7 @@ package de.feckert.congame;
 
 import de.feckert.congame.troops.Troop;
 import de.feckert.congame.util.ActionResult;
+import de.feckert.congame.util.Console;
 
 public class CapturePoint extends Troop {
 	public int owner;

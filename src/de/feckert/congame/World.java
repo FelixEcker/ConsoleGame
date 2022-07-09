@@ -55,7 +55,7 @@ public class World {
 	}
 	
 	public static boolean isFieldCP(int x, int y) {
-		return capturePoints[y][x] == null;
+		return capturePoints[y][x] != null;
 	}
 	
 
@@ -89,7 +89,9 @@ public class World {
 	public static void updateTroops() {
 		for (int y = 0; y < troops.length; y++) {
 			for (int x = 0; x < troops[y].length; x++) {
-				if (troops[y][x] !=  null) troops[y][x].update();
+				if (troops[y][x] !=  null) {
+					troops[y][x].update();
+				}
 			}
 		}
 	}
