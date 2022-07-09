@@ -53,6 +53,8 @@ public abstract class Troop {
 
 		if (targetDHealth < 0) targetDHealth = 0;
 		if (targetCHealth < 0) targetCHealth = 0;
+		target.defenseHealth = targetDHealth;
+		target.health = targetCHealth;
 		
 		if (targetCHealth <= 0 && targetDHealth <= .05) {
 			return ActionResult.POINT_CAPTURABLE;

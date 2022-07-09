@@ -14,6 +14,7 @@ public class Console {
 		ansiFormats.put('^', Ansi.WHITE);
 
 		messages.put("attack.target_defends", "The target of your attack attacks back!");
+		messages.put("attack.cp_defends", "The Capture Point defends itself!");
 	}
 
 	/**

@@ -106,7 +106,10 @@ public class Main {
             	coords = translateCoordinates(parameters[0]);
                 int attX = coords[0];
                 int attY = coords[1];
-                if (!World.troopAt(attX, attY)) {System.out.println("No troop at "+parameters[0]);}
+                if (!World.troopAt(attX, attY)) {
+                	System.out.println("No troop at "+parameters[0]); 
+                	break;
+                }
 
                 troop = World.troop(attX, attY);
                 if (!troop.team) {
@@ -118,11 +121,11 @@ public class Main {
                 int defX = coords[0];
                 int defY = coords[1];
                 if (!World.troopAt(defX, defY)) {
-                	System.out.println("No troop or troop at "+parameters[1]);
                 	if (World.isFieldCP(defX, defY)) {
                 		attackCP(attX, attY, troop, defX, defY);
                     	return;
                 	}
+                	System.out.println("No troop or capture point at "+parameters[1]);
                 	return;
                 }
 
@@ -169,7 +172,7 @@ public class Main {
             	int pX = coords[0];
                 int pY = coords[1];
                 if (!World.isFieldCP(pX, pY)) {
-                	System.out.println("That field is not a Capture Point!");
+                	System.out.println("That fieSome ld is not a Capture Point!");
                 	return;
                 }
 
