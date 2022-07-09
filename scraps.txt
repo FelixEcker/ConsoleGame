@@ -8,6 +8,15 @@ General Todo:
 		- Thats gonna be a seperate branch, cant be bothered to restructure the entire code
 		  to support Single & Multiplayer in one executable
 
+Multiplayer:
+	- Text messages send as ids (e.g. "troop.attack.used")
+		- Sent as CLST, id is first entry. If the corresponding
+		  message should be a format string, the strings are
+		  also in the CLST.
+			("some.msg.with.formats;format string one;format string two;")
+	- For Map updates sends a single "Map" object containing the maps of terrain, control points and troops
+	- Commands sent as numbers (nextTurn -> 0x00 etc.)
+
 Goal (?): Territory Control
 	- Capture n Points across the map
 	- First player to capture all points wins
