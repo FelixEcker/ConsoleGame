@@ -1,4 +1,4 @@
-Scrap file for Game Ideas & Bugs
+Scrap file for Game Ideas & Bugs (Crappy design doc)
 
 Goal (?): Territory Control
 	- Capture n Points across the map
@@ -11,7 +11,7 @@ Capture Points:
 		- They can also once per round attack nearby enemy troups
 	- If Health is at 0% and Defense below 5%, they can be captured
 	- Capturing restores health to 30%, then they have to be repaired
-	- Repairing takes multiple turns
+	- Repairing takes multiple turns (automatic)
 	- Have 2 Sets of health
 		1. Defense
 		2. Core
@@ -22,7 +22,7 @@ Capture Points:
 	  to capture one, the "capture" action is to be used, which can intern attack
           a capture point.
 
-Troops: (These values were chosen arbitrarily)
+Troops: (These values were chosen arbitrarily, will be balanced when the game is playable)
 Artillery
   - Attack Radius of 4
   - 12.5% damage

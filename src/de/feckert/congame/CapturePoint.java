@@ -58,4 +58,8 @@ public class CapturePoint extends Troop {
 
 		return ActionResult.SUCCESS;
 	}
+	
+	public static boolean capturable(CapturePoint cp) {
+		return cp.health == 0 && cp.defenseHealth < .05f;
+	}
 }

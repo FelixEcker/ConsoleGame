@@ -41,6 +41,12 @@ public abstract class Troop {
 	// should remain the same in all cases, the method could be overriden for extra things on attack
 	// like inflicting certain effects on the capture points as part of the attack.
 	public ActionResult attackCP(CapturePoint target) {
+		if (attacked) {
+			Console.message("troop.attack.used");
+			return ActionResult.FAILED;
+		}
+		
+		attacked = true;
 		float targetDHealth = target.defenseHealth;
 		float targetCHealth = target.health;
 		
@@ -86,6 +92,7 @@ public abstract class Troop {
 	
 	public void update() {
 		movementThisTurn = movement;
+		attacked = false;
 	}
 
 	// Contains some universal movement checks

@@ -169,14 +169,6 @@ public class Main {
                 break;
             case "capture":
             	coords = translateCoordinates(parameters[0]);
-            	int pX = coords[0];
-                int pY = coords[1];
-                if (!World.isFieldCP(pX, pY)) {
-                	System.out.println("That fieSome ld is not a Capture Point!");
-                	return;
-                }
-
-            	coords = translateCoordinates(parameters[1]);
                 int x = coords[0];
                 int y = coords[1];
                 if (!World.troopAt(x,y)) {
@@ -187,9 +179,33 @@ public class Main {
                 	System.out.println("You cannot use this troop to capture!");
                 	return;
                 }
-                
+            	
+            	coords = translateCoordinates(parameters[1]);
+            	int pX = coords[0];
+                int pY = coords[1];
+                if (!World.isFieldCP(pX, pY)) {
+                	System.out.println("That field is not a Capture Point!");
+                	return;
+                }
+                CapturePoint cp = World.capturePoint(pX, pY);
+
                 if (troop.canTravelTo(x, y, pX, pY)) {
-                	// TODO: Capturing Logic
+                	if (CapturePoint.capturable(cp)) {
+                		redrawMapPostAction = true;
+                		cp.owner = 1;
+                		cp.health = .3f;
+                		
+                		System.out.println("You successfully captured this point! It's health was restored to 30%!");
+                		return;
+                	} else {
+                		System.out.printf("The Capture Point is not in a capturable state!\n (Health: %.2f%% Defense Health: %.2f%%\n",
+                				cp.health*100, cp.defenseHealth*100);
+                		System.out.println("Do you want to attack it?");
+                		if (chooseYesNo()) {
+                			doAction("attack "+parameters[0]+" "+parameters[1]);
+                		}
+                	}
+                	return;
                 } else {
                 	System.out.println("The troop can't the travel to that Capture Point!");
                 }
@@ -224,6 +240,7 @@ public class Main {
         }
     }
     
+    // Own function in attempt to declutter the doAction function
     public static void attackCP(int attX, int attY, Troop attacker, int defX, int defY) {
     	CapturePoint point = World.capturePoint(defX, defY);
     	ActionResult result = attacker.attackCP(point);
@@ -232,16 +249,21 @@ public class Main {
     	case POINT_CAPTURABLE:
     		System.out.println("You've sunken the Point's core health to 0% and its defense health below 5%, you can now capture it!");
     		System.out.printf("Your troop is now at %.2f%% health!\n", attacker.health*100);
+        	redrawMapPostAction = true;
     		break;
     	case TROOP_DIED:
             System.out.printf("Your troop died! Capture Point is at %.2f%% core health and %.2f%% defense health\n",
                     point.health*100, point.defenseHealth*100);
             World.removeTroop(attX, attY);
+        	redrawMapPostAction = true;
     		break;
     	case SUCCESS:
             System.out.printf("The Capture Point is at %.2f%% core health and %.2f%% defense health\n",
                     point.health*100, point.defenseHealth*100);
     		System.out.printf("Your troop is now at %.2f%% health!\n", attacker.health*100);
+    		break;
+    	case FAILED:
+    		System.out.println("Attack Failed!");
     		break;
     	default:
     		// TODO: WRITE CODE

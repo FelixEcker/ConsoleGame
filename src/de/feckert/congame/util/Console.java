@@ -15,6 +15,7 @@ public class Console {
 
 		messages.put("attack.target_defends", "The target of your attack attacks back!");
 		messages.put("attack.cp_defends", "The Capture Point defends itself!");
+		messages.put("troop.attack.used", "You cannot attack using this troup, it has already executed an attack this round!");
 	}
 
 	/**
