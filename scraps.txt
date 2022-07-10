@@ -1,7 +1,6 @@
 Scrap file for Game Ideas & Bugs (Crappy design doc)
 
 General Todo:
-	- Implement Automatic defense repair
 	- Implement checking for player wins after one player finishes turn
 	- Implement Enemy "AI"
 	- Maybe (really maybe, if I end up liking the game) Implement server for multiplayer
@@ -16,6 +15,12 @@ Multiplayer:
 			("some.msg.with.formats;format string one;format string two;")
 	- For Map updates sends a single "Map" object containing the maps of terrain, control points and troops
 	- Commands sent as numbers (nextTurn -> 0x00 etc.)
+
+Computer Enemy:
+	- Target Priorities: Capture Point, Troop of largest threat (which has a chance to be defeated), Medic, All Other Troops (Weaksted->Strongest)
+	- Capture Point Priority: 1. Unowned, 2. Player
+	- Always prefers next capture point, regardless of owner
+	- If an Unowned Point is nearer than a player owned point, go for that.
 
 Goal (?): Territory Control
 	- Capture n Points across the map
