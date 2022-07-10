@@ -38,6 +38,8 @@ Capture Points:
 	- NOTE FOR ATTACKING CAPTURE POINTS: Attacking a CP should never capture them, 
 	  to capture one, the "capture" action is to be used, which can intern attack
           a capture point.
+	- Capture Points can deploy Troops
+		- No Idea yet for what you need to deploy a troop or how much of it for different types
 
 Troops: (These values were chosen arbitrarily, will be balanced when the game is playable)
 Artillery

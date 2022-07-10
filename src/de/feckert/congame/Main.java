@@ -23,6 +23,7 @@ public class Main {
 
     // I attempted to use as little OOP shit as possible,
     // ideally the only use would be for Troops.
+    // Multiplayer version is probably gonna use a lot more
     public static void main(String[] args) {
     	World.generate(12, 12);
     	
@@ -211,6 +212,35 @@ public class Main {
                 }
                 
             	break;
+            case "deploy":
+            	coords = translateCoordinates(parameters[0]);
+            	x = coords[0];
+            	y = coords[1];
+            	if (!World.isFieldCP(x,y)) {
+            		System.out.println("Can't deploy troop here; Field is not a Capture Point!");
+            		return;
+            	}
+            	
+            	cp = World.capturePoint(x,y);
+            	if (cp.owner != 1) {
+            		System.out.println("Can't deploy troop here; Capture Point does not belong to you!");
+            		return;
+            	}
+            	
+            	int code = World.createTroopByName(parameters[1].toLowerCase(), 1, x, y);
+            	switch (code) {
+            	case 0:
+            		System.out.println("Deployed Troop!");
+            		break;
+            	case 1:
+            		System.out.println("There is no Troop by that name!");
+            		break;
+            	case 2:
+            		System.out.println("Could not find a Valid field around the Capture Point to deploy your troop!");
+            		break;
+            	}
+            	// TODO: Cost dedeuctionasnoa
+            	break;
             case "troop": // Prints out information/stats of a troop at x,y coordinates
             	coords = translateCoordinates(parameters[0]);
                 x = coords[0];
@@ -266,7 +296,6 @@ public class Main {
     		System.out.println("Attack Failed!");
     		break;
     	default:
-    		// TODO: WRITE CODE
 			System.err.println(Main.class.getClass().getName()+"#doAction -> "+
     		Main.class.getClass().getName()+"#attackCP ActionResult message switch statement defaulted! This wasn't supposed to happen!");
 			System.exit(-1);

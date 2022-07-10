@@ -1,5 +1,7 @@
 package de.feckert.congame.troops;
 
+import java.util.ArrayList;
+
 import de.feckert.congame.CapturePoint;
 import de.feckert.congame.World;
 import de.feckert.congame.util.ActionResult;
@@ -9,6 +11,22 @@ import de.feckert.congame.util.Console;
  * Base Class for all Troops.
  * */
 public abstract class Troop {
+	public static final ArrayList<String> NAMES = new ArrayList<>();
+	
+	static {
+		NAMES.add("scout");
+		NAMES.add("artillery");
+		NAMES.add("heavy artillery");
+		NAMES.add("infantry");
+		NAMES.add("medic");
+	}
+	
+	public static int movementDistance(int originX, int originY, int destX, int destY) {
+		return Math.abs(destX - originX) + Math.abs(destY - originY);
+	}
+	
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
 	public boolean team = false;     // False = Enemy ; True = Self
 	public float health = 1.0f;      // Health of the Troop
 	public float attackDmg = 0.0f;   // How much damage the Troop deals
@@ -23,14 +41,11 @@ public abstract class Troop {
 	public boolean attacked = false; // Should be set to true once the troop attacked something, reset every round
 	public boolean pUsed = false; // True once primary action was used, reset every round
 	public boolean sUsed = false; // True once secondary action was used, reset every round
-
+	
 	public Troop(boolean team) {
 		this.team = team;
 	}
 
-	public static int movementDistance(int originX, int originY, int destX, int destY) {
-		return Math.abs(destX - originX) + Math.abs(destY - originY);
-	}
 
 	public ActionResult attack(Troop target) {
 		return ActionResult.INVALID;

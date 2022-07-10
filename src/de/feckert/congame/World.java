@@ -1,5 +1,6 @@
 package de.feckert.congame;
 
+import de.feckert.congame.troops.Scout;
 import de.feckert.congame.troops.Troop;
 
 public class World {
@@ -32,7 +33,7 @@ public class World {
 	
 	public static void generate(int width, int height) {
 		// TODO: World Generation
-		capturePoints[2][2] = new CapturePoint(2, 2, 2, .3f);
+		capturePoints[2][2] = new CapturePoint(1, 2, 2, .3f);
 	}
 	
 	/**
@@ -110,5 +111,63 @@ public class World {
 	 * */
 	public static void removeTroop(int attX, int attY) {
 		troops[attY][attX] = null;
+	}
+
+	public static int createTroopByName(String name, int team, int x, int y) {
+		// 0 Success
+		// 1 Invalid Troop
+		// 2 No Valid Fields
+		if (!Troop.NAMES.contains(name)) return 1;
+		
+		switch (name) {
+		case "scout":
+			Scout temp = new Scout(team == 1);
+			int[] newCoords = findNewField(x,y, temp);
+			x = newCoords[0];
+			y = newCoords[1];
+			
+			if (isFieldCP(x, y) || map[y][x] == '^' || (map[y][x] == '~' && !temp.waterTravel)) {
+				return 2;
+			}
+			
+			placeTroop(temp, x, y);
+			break;
+		default:
+			System.err.println(World.class.getClass().getName()+"#createTroopByName switch statement defaulted! Something went wrong; Invalid troop name passed through check!");
+			System.exit(-1);
+			break;
+		}
+		
+		return 0;
+	}
+	
+	// THERE HAS TO BE A BETTER WAY TO DO THIS
+	// I REFUSE TO KEEP THIS PIECE OF CODE IN HERE
+	// BUT I CANT THINK OF A BETTER WAY RIGHT NOW
+	private static int[] findNewField(int x, int y, Troop temp) {
+		x -= 1;
+		if (troopAt(x, y) || isFieldCP(x, y) || map[y][x] == '^' || (map[y][x] == '~' && !temp.waterTravel)) {
+			y -= 1;
+			if (troopAt(x, y) || isFieldCP(x, y) || map[y][x] == '^' || (map[y][x] == '~' && !temp.waterTravel)) {
+				x++;
+				if (troopAt(x, y) || isFieldCP(x, y) || map[y][x] == '^' || (map[y][x] == '~' && !temp.waterTravel)) {
+					x++;
+					if (troopAt(x, y) || isFieldCP(x, y) || map[y][x] == '^' || (map[y][x] == '~' && !temp.waterTravel)) {
+						y++;
+						if (troopAt(x, y) || isFieldCP(x, y) || map[y][x] == '^' || (map[y][x] == '~' && !temp.waterTravel)) {
+							y++;
+							if (troopAt(x, y) || isFieldCP(x, y) || map[y][x] == '^' || (map[y][x] == '~' && !temp.waterTravel)) {
+								x++;
+								if (troopAt(x, y) || isFieldCP(x, y) || map[y][x] == '^' || (map[y][x] == '~' && !temp.waterTravel)) {
+									x++;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		
+		return new int[] {x,y};
 	}
 }
