@@ -87,12 +87,20 @@ public class World {
 	/**
 	 * Updates all troops (Round Healing, Movement Restoration,...)
 	 * */
-	public static void updateTroops() {
+	public static void updateWorld() {
+		// Troops
 		for (int y = 0; y < troops.length; y++) {
 			for (int x = 0; x < troops[y].length; x++) {
 				if (troops[y][x] !=  null) {
 					troops[y][x].update();
 				}
+			}
+		}
+		
+		// Capture Points
+		for (int y = 0; y < capturePoints.length; y++) {
+			for (int x = 0; x < capturePoints[y].length; x++) {
+				capturePoints[y][x].update();
 			}
 		}
 	}

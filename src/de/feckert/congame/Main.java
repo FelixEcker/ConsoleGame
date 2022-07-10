@@ -34,7 +34,7 @@ public class Main {
         World.placeTroop(s1, 0, 1);
         
         while (true) {
-            World.updateTroops();
+            World.updateWorld();
             System.out.println("====================");
             System.out.println("Turn "+turnNum+" //\n");
             Console.drawMap();
@@ -193,8 +193,7 @@ public class Main {
                 if (troop.canTravelTo(x, y, pX, pY)) {
                 	if (CapturePoint.capturable(cp)) {
                 		redrawMapPostAction = true;
-                		cp.owner = 1;
-                		cp.health = .3f;
+                		cp.captured(1);
                 		
                 		System.out.println("You successfully captured this point! It's health was restored to 30%!");
                 		return;

@@ -9,6 +9,7 @@ public class CapturePoint extends Troop {
 	public float defenseHealth;
 	public float defenseDmg;
 	public int x, y;
+	public boolean fullHealedPostCapture;
 	
 	public CapturePoint(int owner, int x, int y, float damage) {
 		super(false);
@@ -26,6 +27,7 @@ public class CapturePoint extends Troop {
 		this.owner = newOwner;
 		this.defenseHealth = .5f;
 		this.health = .3f;
+		this.fullHealedPostCapture = false;
 	}
 	
 	public void defend(Troop attacker, int aX, int aY) {
@@ -57,6 +59,28 @@ public class CapturePoint extends Troop {
 		}
 
 		return ActionResult.SUCCESS;
+	}
+	
+	public void update() {
+		// Healing logic according to scraps.txt (See "Capture Points")
+		if (defenseHealth != 1f) {
+			if (!fullHealedPostCapture) {
+				defenseHealth += .2f;
+				if (defenseHealth >= 1f) {
+					defenseHealth = 1f;
+					fullHealedPostCapture = true;
+				}
+			} else {
+				defenseHealth += .1f;
+				if (defenseHealth >= 1f)defenseHealth = 1f;
+			}
+		}
+		
+		if (health != 1f) {
+			if (health > .85f) health += .075f;
+			if (health < .85f) health += .15f;
+			if (health > 1f) health = 1f;
+		}
 	}
 	
 	public static boolean capturable(CapturePoint cp) {

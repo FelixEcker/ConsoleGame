@@ -29,6 +29,12 @@ Capture Points:
 	- If Health is at 0% and Defense below 5%, they can be captured
 	- Capturing restores health to 30%, then they have to be repaired
 	- Repairing takes multiple turns (automatic)
+		- Defense:
+			- Repairing after Capture is 20% per round
+			- After defense restored for 1st time repair rate becomes 10%
+		- Core:
+			- Repairingis 15% per round
+			- After 85% is reached repair rate is 7.5%
 	- Have 2 Sets of health
 		1. Defense
 		2. Core
