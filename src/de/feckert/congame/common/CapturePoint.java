@@ -1,6 +1,6 @@
-package de.feckert.congame;
+package de.feckert.congame.common;
 
-import de.feckert.congame.troops.Troop;
+import de.feckert.congame.common.troops.Troop;
 import de.feckert.congame.util.ActionResult;
 import de.feckert.congame.util.Console;
 

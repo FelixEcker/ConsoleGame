@@ -1,9 +1,10 @@
-package de.feckert.congame.troops;
+package de.feckert.congame.common.troops;
 
 import java.util.ArrayList;
 
-import de.feckert.congame.CapturePoint;
-import de.feckert.congame.World;
+import de.feckert.congame.common.CapturePoint;
+import de.feckert.congame.common.World;
+import de.feckert.congame.server.Server;
 import de.feckert.congame.util.ActionResult;
 import de.feckert.congame.util.Console;
 
@@ -112,10 +113,10 @@ public abstract class Troop {
 
 	// Contains some universal movement checks
 	public boolean canTravelTo(int originX, int originY, int destX, int destY) {
-		if (!World.troopAt(originX, originY)) return false;
+		if (!Server.world.troopAt(originX, originY)) return false;
 		if (movementThisTurn <= 0) return false;
 		if (movementDistance(originX, originY, destX, destY) > movementThisTurn) return false;
-		if (World.map[destY][destX] == '^') return false;
+		if (Server.world.map[destY][destX] == '^') return false;
 		return true;
 	}
 

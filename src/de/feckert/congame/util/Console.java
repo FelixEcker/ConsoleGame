@@ -2,7 +2,7 @@ package de.feckert.congame.util;
 
 import java.util.HashMap;
 
-import de.feckert.congame.World;
+import de.feckert.congame.common.World;
 
 public class Console {
 	public static HashMap<Character, String> ansiFormats = new HashMap<>();

@@ -1,0 +1,22 @@
+Multiplayer "(Crappy) Design Doc"
+
+PLAYING-COMMANDS
+A Playing Command means commands that a Player sends to the server to play their turn. Each
+command message is sent as a String.
+
+NAMES:
+	- deploy
+	- capture
+	- attack
+	- move
+	- troop
+	- finish
+
+PROTOCOL-COMMANDS
+NUMBER | NAME            | DATA  | DESCRIPTION
+0      | redraw          | World | Tells the Client to redraw the map
+1      | reqWorld        | ////  | Asks the Server to send the World Object
+2      | startTextBlock  | ////  | Tells the Client to print out all data received until block is ended
+3      | endTextBlock    | ////  | Tells the Client to stop printing out all data received
+4      | beginTurn       | ////  | Tells the Client that their turn has begun
+5      | reqInput        | ////  | Request input from Client
