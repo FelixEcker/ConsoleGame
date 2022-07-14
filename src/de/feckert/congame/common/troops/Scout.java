@@ -1,8 +1,8 @@
 package de.feckert.congame.common.troops;
 
+import de.feckert.congame.client.Console;
 import de.feckert.congame.common.CapturePoint;
 import de.feckert.congame.util.ActionResult;
-import de.feckert.congame.util.Console;
 
 public class Scout extends Troop {
 	public Scout(boolean team) {

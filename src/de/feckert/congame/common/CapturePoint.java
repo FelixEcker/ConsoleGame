@@ -1,8 +1,8 @@
 package de.feckert.congame.common;
 
+import de.feckert.congame.client.Console;
 import de.feckert.congame.common.troops.Troop;
 import de.feckert.congame.util.ActionResult;
-import de.feckert.congame.util.Console;
 
 public class CapturePoint extends Troop {
 	public int owner;

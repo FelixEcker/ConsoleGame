@@ -1,11 +1,11 @@
 package de.feckert.congame;
 
+import de.feckert.congame.client.Console;
 import de.feckert.congame.common.CapturePoint;
 import de.feckert.congame.common.World;
 import de.feckert.congame.common.troops.Scout;
 import de.feckert.congame.common.troops.Troop;
 import de.feckert.congame.util.ActionResult;
-import de.feckert.congame.util.Console;
 
 import java.util.Arrays;
 import java.util.Scanner;

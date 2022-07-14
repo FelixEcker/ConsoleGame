@@ -2,11 +2,11 @@ package de.feckert.congame.common.troops;
 
 import java.util.ArrayList;
 
+import de.feckert.congame.client.Console;
 import de.feckert.congame.common.CapturePoint;
 import de.feckert.congame.common.World;
 import de.feckert.congame.server.Server;
 import de.feckert.congame.util.ActionResult;
-import de.feckert.congame.util.Console;
 
 /**
  * Base Class for all Troops.

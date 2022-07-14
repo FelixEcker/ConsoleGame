@@ -1,5 +1,10 @@
 Multiplayer "(Crappy) Design Doc"
 
+MESSAGE PREFIXES
+raw - Raw Text (only used by broadcasts)
+msg - Message IDs with format strings
+cmd - A Command
+
 PLAYING-COMMANDS
 A Playing Command means commands that a Player sends to the server to play their turn. Each
 command message is sent as a String.

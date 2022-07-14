@@ -3,6 +3,7 @@ package de.feckert.congame.server;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.ObjectOutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
@@ -10,16 +11,17 @@ import java.net.Socket;
 import java.util.Arrays;
 
 import de.feckert.congame.Main;
+import de.feckert.congame.client.Console;
 import de.feckert.congame.common.CapturePoint;
 import de.feckert.congame.common.World;
 import de.feckert.congame.common.troops.Troop;
 import de.feckert.congame.util.ActionResult;
-import de.feckert.congame.util.Console;
 
 public class Server {
 	public static ServerSocket socket;
 	
 	public static Socket[] clients;
+	public static ObjectOutputStream[] ooStreams;
 	public static PrintWriter[] clientWriter;
 	public static BufferedReader[] clientReader;
 	
@@ -41,6 +43,7 @@ public class Server {
 			// Accept Players
 			for (int i = 0; i < clients.length; i++) {
 				clients[i] = socket.accept();
+				ooStreams[i]     = new ObjectOutputStream(clients[i].getOutputStream());
 				clientWriter[i]  = new PrintWriter(new OutputStreamWriter(clients[i].getOutputStream()));
 				clientReader[i]  = new BufferedReader(new InputStreamReader(clients[i].getInputStream()));
 			}
@@ -51,16 +54,43 @@ public class Server {
 		}
 	}
 	
-	public static void startGame() {
+	public static void startGame() throws IOException {
 		whoseTurn = 0;
 		oppositePlayer = 1;
 		roundNumber = 0;
 		world = new World();
 		world.generate(12, 12);
 		
+		int lastTurn = whoseTurn;
 		while (world.winningPlayer() == -1) {
+			clientWriter[whoseTurn].println("cmd#beginTurn");
+			while (whoseTurn == lastTurn) {
+				doAction(getInput(whoseTurn));
+				if (redrawMapPostAction) {
+					redrawWorld();
+					redrawMapPostAction = false;
+				}
+			}
+			clientWriter[oppositePlayer].println("cmd#endTurn");
+			lastTurn = whoseTurn;
+
+			// Make sure to exit game loop if someone has won before next player gets to play
+			if (world.winningPlayer() != -1) break;
 			
+			while (whoseTurn == lastTurn) {
+				doAction(getInput(whoseTurn));
+				if (redrawMapPostAction) {
+					redrawWorld();
+					redrawMapPostAction = false;
+				}
+			}
+			clientWriter[oppositePlayer].println("cmd#endTurn");
+			lastTurn = whoseTurn;
+			
+			roundNumber++;
+			broadcast("Round: "+roundNumber);
 		}
+		broadcast(String.format("Player %s won after %s rounds!", world.winningPlayer(), roundNumber));
 	}
 	
 	 /**
@@ -73,7 +103,7 @@ public class Server {
         String[] parameters = Arrays.copyOfRange(split, 1, split.length);
 
         switch (invoke) {
-            case "nextTurn":
+            case "finish":
             	oppositePlayer = whoseTurn;
                 whoseTurn = whoseTurn == 0 ? 1 : 0;
                 break;
@@ -396,9 +426,16 @@ public class Server {
     	return clientReader[client].readLine();
     }
     
+    public static void redrawWorld() throws IOException {
+    	for (int i = 0; i < clients.length; i++) {
+    		clientWriter[i].println("cmd#redraw");
+    		ooStreams[i].writeObject(world);
+    	}
+    }
+    
     public static void broadcast(String msg) {
     	for (PrintWriter writer : clientWriter) {
-    		writer.println(msg);
+    		writer.println("raw#"+msg);
     	}
     }
 }
