@@ -26,6 +26,7 @@ public class Server {
 	public static int roundNumber;
 	public static World world;
 	public static int whoseTurn;
+	public static int oppositePlayer;
 	public static boolean redrawMapPostAction = false;
 	
 	public static void main(String[] args) {
@@ -52,6 +53,7 @@ public class Server {
 	
 	public static void startGame() {
 		whoseTurn = 0;
+		oppositePlayer = 1;
 		roundNumber = 0;
 		world = new World();
 		world.generate(12, 12);
@@ -72,6 +74,7 @@ public class Server {
 
         switch (invoke) {
             case "nextTurn":
+            	oppositePlayer = whoseTurn;
                 whoseTurn = whoseTurn == 0 ? 1 : 0;
                 break;
             case "move":
@@ -146,28 +149,34 @@ public class Server {
                 switch (troop.attack(defender)) {
                 case SUCCESS:
                     clientWriter[whoseTurn].println(
-                    		String.format("msg#action.attack.success;%.2f", troop.health*100, defender.health*100));
+                    		String.format("msg#action.attack.success;%.2f%%", troop.health*100, defender.health*100));
+                	clientWriter[oppositePlayer].println(
+                			String.format("msg#opplayer.troop_attacked.success;%s;%.2f%%", parameters[1], defender.health*100, troop.health*100));
                 	break;
                 case FAILED:
                     clientWriter[whoseTurn].println(
-                    		String.format("msg#action.attack.failed;%.2f", troop.health*100));
+                    		String.format("msg#action.attack.failed;%.2f%%", troop.health*100));
+                	clientWriter[oppositePlayer].println(
+                			String.format("msg#opplayer.troop_attacked.failed;%s;%.2f%%", parameters[1], troop.health*100));
                 	break;
                 case INVALID:
                     clientWriter[whoseTurn].println("msg#action.attack.invalid");
                 	break;
                 case TROOP_DIED:
                     clientWriter[whoseTurn].println(
-                        			String.format("msg#action.attack.troopdied;%.2f",defender.health*100));
+                        			String.format("msg#action.attack.troopdied;%.2f%%",defender.health*100));
+                	clientWriter[oppositePlayer].println(
+                			String.format("msg#opplayer.troop_attacked.attacker_died;%s;%.2f%%", parameters[1], defender.health*100));
                     world.removeTroop(attX, attY);
                 	break;
                 case TARGET_DIED:
                     world.removeTroop(defX, defY);
-                    troop.health += 0.action.capture.no_troop04; // Award health for killing
+                    troop.health += 0.04f; // Award health for killing
                     if (troop.health > 1.0f) troop.health = 1.0f; // Make sure troop hasnt got more than 1.0f health
-                    System.out.printf("",
-                            troop.health*100);
                 	clientWriter[whoseTurn].println(
-                			String.format("msg#action.attack.targetdied;%.2f",troop.health*100));
+                			String.format("msg#action.attack.targetdied;%.2f%%",troop.health*100));
+                	clientWriter[oppositePlayer].println(
+                			String.format("msg#opplayer.troop_attacked.died;%s;%.2f%%", parameters[1], troop.health*100));
                     break;
 				default:
 					String errln = Main.class.getClass().getName()+"#doAction (attack) switch statement defaulted! This wasn't supposed to happen!";
@@ -205,13 +214,21 @@ public class Server {
                 if (troop.canTravelTo(x, y, pX, pY)) {
                 	if (CapturePoint.capturable(cp)) {
                 		redrawMapPostAction = true;
+                		int prevOwner = cp.owner;
                 		cp.captured(whoseTurn);
                 		
                 		clientWriter[whoseTurn].println("msg#action.capture.success");
+                		if (prevOwner == oppositePlayer) {
+                			clientWriter[oppositePlayer].println(
+                					String.format("msg#opplayer.owned_cp.captured;%s",parameters[1]));
+                		} else {
+                			clientWriter[oppositePlayer].println(
+                					String.format("msg#opplayer.unowned_cp.captured;%s",parameters[1]));
+                		}
                 		return;
                 	} else {
                 		clientWriter[whoseTurn].println(
-                				String.format("msg#action.capture.point_uncapturable;%.2f;%.2f", cp.health*100, cp.defenseHealth*100));
+                				String.format("msg#action.capture.point_uncapturable;%.2f%%;%.2f%%", cp.health*100, cp.defenseHealth*100));
                 		clientWriter[whoseTurn].println("msg#action.capture.wish_attack");
                 		if (chooseYesNo()) {
                 			doAction("attack "+parameters[0]+" "+parameters[1]);
@@ -242,6 +259,8 @@ public class Server {
             	switch (code) {
             	case 0:
             		clientWriter[whoseTurn].println("msg#action.deploy.success");
+            		clientWriter[oppositePlayer].println(
+            				String.format("msg#opplayer.enemy.deployed_troop;%s;%s", parameters[1].toLowerCase(), parameters[0]));
             		break;
             	case 1:
             		clientWriter[whoseTurn].println("msg#action.deploy.invalid_troop");
@@ -250,6 +269,7 @@ public class Server {
             		clientWriter[whoseTurn].println("msg#action.deploy.no_valid_field");
             		break;
             	}
+            	redrawMapPostAction = true;
             	// TODO: Cost dedeuctionasnoa
             	break;
             case "troop": // Prints out information/stats of a troop at x,y coordinates
@@ -294,25 +314,41 @@ public class Server {
     	case POINT_CAPTURABLE:
     		clientWriter[whoseTurn].println("msg#action.point_capturable");
     		clientWriter[whoseTurn].println(
-    				String.format("msg#player.troop.newhealth;%.2f", attacker.health*100));
+    				String.format("msg#player.troop.newhealth;%.2f%%", attacker.health*100));
+    		clientWriter[oppositePlayer].println(
+    				String.format("msg#opplayer.cp.made_capturable;%s", coordString(defX, defY)));
         	redrawMapPostAction = true;
     		break;
     	case TROOP_DIED:
-            System.out.printf("Your troop died! Capture Point is at %.2f%% core health and %.2f%% defense health\n",
-                    point.health*100, point.defenseHealth*100);
             clientWriter[whoseTurn].println(
-            		String.format("msg#action.attack_cp.troopdied;%.2f;%.2f", point.health*100, point.defenseHealth*100));
+            		String.format("msg#action.attack_cp.troopdied;%.2f%%;%.2f%%", point.health*100, point.defenseHealth*100));
+    		clientWriter[oppositePlayer].println(
+    				String.format("msg#opplayer.cp.att_troop_died;%s", coordString(defX, defY)));
+    		clientWriter[oppositePlayer].println(
+    	    				String.format("msg#action.attack_cp.success;%.2f%%;%.2f%%", point.health*100, point.defenseHealth*100));
+    	    		
             world.removeTroop(attX, attY);
         	redrawMapPostAction = true;
     		break;
     	case SUCCESS:
     		clientWriter[whoseTurn].println(
-    				String.format("msg#action.attack_cp.success;%.2f;%.2f", point.health*100, point.defenseHealth*100));
+    				String.format("msg#action.attack_cp.success;%.2f%%;%.2f%%", point.health*100, point.defenseHealth*100));
     		clientWriter[whoseTurn].println(
-    				String.format("msg#player.troop.newhealth;%.2f", attacker.health*100));
+    				String.format("msg#player.troop.newhealth;%.2f%%", attacker.health*100));
+    		clientWriter[oppositePlayer].println(
+    				String.format("msg#opplayer.cp.att_success;%s;%.2f%%;%.2f%%", coordString(defX, defY),
+    						point.health*100, point.defenseHealth*100));
+    		clientWriter[oppositePlayer].println(
+    				String.format("msg#opplayer.cp.att_success2;%.2f%%", attacker.health*100));
     		break;
     	case FAILED:
     		clientWriter[whoseTurn].println("msg#action.attack_cp.failed");
+    		clientWriter[whoseTurn].println(
+    				String.format("msg#action.attack_cp.failed2;%.2f%%", attacker.health*100));
+    		clientWriter[oppositePlayer].println(
+    				String.format("msg#opplayer.cp.att_failed;%s", coordString(defX, defY)));
+    		clientWriter[oppositePlayer].println(
+    				String.format("msg#opplayer.cp.att_success2;%.2f%%", attacker.health*100));
     		break;
     	default:
     		String errln = Main.class.getClass().getName()+"#doAction -> "+
@@ -325,7 +361,9 @@ public class Server {
     	}
     }
     
-
+    public static String coordString(int x, int y) {
+    	return x+";"+((char) 65+y);
+    }
     
     public static int[] translateCoordinates(String raw) {
     	return new int[] {
