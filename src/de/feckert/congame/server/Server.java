@@ -10,7 +10,6 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Arrays;
 
-import de.feckert.congame.Main;
 import de.feckert.congame.client.Console;
 import de.feckert.congame.common.CapturePoint;
 import de.feckert.congame.common.World;
@@ -209,7 +208,7 @@ public class Server {
                 			String.format("msg#opplayer.troop_attacked.died;%s;%.2f%%", parameters[1], troop.health*100));
                     break;
 				default:
-					String errln = Main.class.getClass().getName()+"#doAction (attack) switch statement defaulted! This wasn't supposed to happen!";
+					String errln = Server.class.getClass().getName()+"#doAction (attack) switch statement defaulted! This wasn't supposed to happen!";
 					System.err.println(errln);
 					broadcast("A Server error has occured! The server is now exiting.");
 					broadcast("("+errln+")");
@@ -381,8 +380,8 @@ public class Server {
     				String.format("msg#opplayer.cp.att_success2;%.2f%%", attacker.health*100));
     		break;
     	default:
-    		String errln = Main.class.getClass().getName()+"#doAction -> "+
-    	    		Main.class.getClass().getName()+"#attackCP ActionResult message switch statement defaulted! This wasn't supposed to happen!";
+    		String errln = Server.class.getClass().getName()+"#doAction -> "+
+    	    		Server.class.getClass().getName()+"#attackCP ActionResult message switch statement defaulted! This wasn't supposed to happen!";
 			System.err.println(errln);
 			broadcast("A Server error has occured! The server is now exiting.");
 			broadcast("("+errln+")");
