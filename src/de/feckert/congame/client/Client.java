@@ -7,6 +7,8 @@ import java.io.ObjectInputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Arrays;
 
 import org.json.JSONObject;
@@ -22,10 +24,22 @@ public class Client {
 	
 	public static JSONObject messageStrings;
 	
-	public static void main(String[] args) throws UnknownHostException, IOException {
+	public static void main(String[] args) throws UnknownHostException, IOException, InterruptedException {
 		init();
 		
-		server = new Socket("localhost", 3103);
+		int conAttempts = 0;
+		while (true) {
+			conAttempts++;
+			try {
+				server = new Socket("localhost", 3103);
+			} catch (IOException e){
+				System.out.printf("Failed to reach server (%s attempts)\r", conAttempts);
+				if (conAttempts > 10) System.exit(-1);
+				Thread.sleep(1000);
+				continue;
+			}
+			break;
+		}
 		out = new PrintWriter(server.getOutputStream(), true);
 		in = new BufferedReader(new InputStreamReader(server.getInputStream()));
         oiStream = new ObjectInputStream(server.getInputStream());
@@ -46,13 +60,26 @@ public class Client {
         		System.out.println(cont);
         		break;
         	case "cmd":
+				procCommand(cont);
         		break;
         	}
         }
 	}
+
+	public static void procCommand(String command) {
+
+	}
 	
 	public static void init() {
-		// TODO: Load Message Strings
+		try {
+			String lines = new String(Files.readAllBytes(
+					Paths.get(Client.class.getResource("/de/feckert/congame/strings.json").getPath())));
+			messageStrings = new JSONObject(lines);
+		} catch (IOException | NullPointerException e) {
+			System.out.println("Failed to load message strings (expected at de.feckert.congame.strings.json)");
+			e.printStackTrace();
+			System.exit(-1);
+		}
 	}
 	
 	public static String fetchMessage(String id) {

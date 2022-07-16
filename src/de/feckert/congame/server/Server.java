@@ -15,6 +15,7 @@ import de.feckert.congame.common.CapturePoint;
 import de.feckert.congame.common.World;
 import de.feckert.congame.common.troops.Troop;
 import de.feckert.congame.util.ActionResult;
+import de.feckert.congame.util.Logger;
 
 public class Server {
 	public static ServerSocket socket;
@@ -29,11 +30,15 @@ public class Server {
 	public static int whoseTurn;
 	public static int oppositePlayer;
 	public static boolean redrawMapPostAction = false;
-	
+
+	public static final Logger logger = Logger.create("CON_GAME_SERVER");
+
 	public static void main(String[] args) {
+		logger.info("Server started!");
 		try {
 			// Setup
 			clients = new Socket[2];
+			ooStreams = new ObjectOutputStream[clients.length];
 			clientWriter = new PrintWriter[clients.length];
 			clientReader = new BufferedReader[clients.length];
 		
@@ -45,6 +50,7 @@ public class Server {
 				ooStreams[i]     = new ObjectOutputStream(clients[i].getOutputStream());
 				clientWriter[i]  = new PrintWriter(new OutputStreamWriter(clients[i].getOutputStream()));
 				clientReader[i]  = new BufferedReader(new InputStreamReader(clients[i].getInputStream()));
+				logger.infof("Accepted client %s\n", i);
 			}
 			
 			startGame();
@@ -57,9 +63,12 @@ public class Server {
 		whoseTurn = 0;
 		oppositePlayer = 1;
 		roundNumber = 0;
+
+		logger.info("Generating world...");
 		world = new World();
 		world.generate(12, 12);
-		
+		logger.info("World generated, starting game!");
+
 		int lastTurn = whoseTurn;
 		while (world.winningPlayer() == -1) {
 			clientWriter[whoseTurn].println("cmd#beginTurn");
