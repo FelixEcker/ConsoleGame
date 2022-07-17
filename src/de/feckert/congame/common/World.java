@@ -135,7 +135,7 @@ public class World implements Serializable {
 		
 		switch (name) {
 		case "scout":
-			Scout temp = new Scout(team == 1);
+			Scout temp = new Scout(team);
 			int[] newCoords = findNewField(x,y, temp);
 			x = newCoords[0];
 			y = newCoords[1];

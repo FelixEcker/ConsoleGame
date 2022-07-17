@@ -6,6 +6,7 @@ import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Scanner;
 
 import org.json.JSONObject;
 
@@ -13,11 +14,11 @@ import de.feckert.congame.common.World;
 
 public class Client {
 	public static World world;
+	public static int playerNum = -1;
 	public static Socket server;
 	public static PrintWriter out;
-	//public static BufferedReader in;
 	public static ObjectInputStream in;
-	
+	public static Scanner clientIn = new Scanner(System.in);
 	public static JSONObject messageStrings;
 	
 	public static void main(String[] args) throws IOException, InterruptedException, ClassNotFoundException {
@@ -70,8 +71,13 @@ public class Client {
 	}
 
 	public static void procCommand(String command) throws IOException, ClassNotFoundException {
-		switch (command) {
-
+		if (command.matches("reqInput")) {
+			System.out.print("> ");
+			out.println(clientIn.nextLine());
+		} else if (command.startsWith("assignPlayerNum:")) {
+			playerNum = Integer.valueOf(command.split(":")[1]);
+		} else {
+			System.out.printf("ERROR: Received invalid command \"%s\" from server!\n", command);
 		}
 	}
 	

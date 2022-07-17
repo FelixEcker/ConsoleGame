@@ -68,7 +68,10 @@ public class Server {
 
 		// Wait until both clients ready
 		for (int i = 0; i < clients.length; i++) {
-			if (clientReader[i].readLine().matches("cmd#ready")) continue;
+			if (clientReader[i].readLine().matches("cmd#ready")) {
+				ooStreams[i].writeObject("cmd#assignPlayerNum:"+i);
+				continue;
+			}
 		}
 
 		broadcast("Round: "+roundNumber);
@@ -76,7 +79,7 @@ public class Server {
 
 		int lastTurn = whoseTurn;
 		while (world.winningPlayer() == -1) {
-			ooStreams[whoseTurn].writeObject("cmd#beginTurn");
+			broadcast(String.format("Player %s's turn", whoseTurn));
 			while (whoseTurn == lastTurn) {
 				doAction(getInput(whoseTurn));
 				if (redrawMapPostAction) {
@@ -89,7 +92,8 @@ public class Server {
 
 			// Make sure to exit game loop if someone has won before next player gets to play
 			if (world.winningPlayer() != -1) break;
-			
+
+			broadcast(String.format("Player %s's turn", whoseTurn));
 			while (whoseTurn == lastTurn) {
 				doAction(getInput(whoseTurn));
 				if (redrawMapPostAction) {
@@ -143,7 +147,7 @@ public class Server {
                     redrawMapPostAction = true;
                 } else { // A Troop is already on the destination tile, if its an enemy offer to attack
                 	ooStreams[whoseTurn].writeObject("msg#action.move.field_occupied");
-                    if (!world.troop(destX, destY).team) {
+                    if (world.troop(destX, destY).team != whoseTurn) {
                     	ooStreams[whoseTurn].writeObject("msg#action.move.wish_attack");
                         if (chooseYesNo()) {
                             doAction("attack "+parameters[0]+" "+parameters[1]);
@@ -165,7 +169,7 @@ public class Server {
                 }
 
                 troop = world.troop(attX, attY);
-                if (!troop.team) {
+                if (troop.team != whoseTurn) {
                     ooStreams[whoseTurn].writeObject("msg#action.attack.attacker_not_yours;"+parameters[0]);
                     return;
                 }
@@ -183,7 +187,7 @@ public class Server {
                 }
 
                 Troop defender = world.troop(defX, defY);
-                if (defender.team) {
+                if (defender.team == whoseTurn) {
                     ooStreams[whoseTurn].writeObject("msg#action.attack.target_same_team;"+parameters[0]);
                     return;
                 }
@@ -240,7 +244,7 @@ public class Server {
                 	ooStreams[whoseTurn].writeObject("msg#action.capture.no_troop");
                 }
                 troop = world.troop(x, y);
-                if (!troop.team || !troop.canCapture) {
+                if (troop.team != whoseTurn || !troop.canCapture) {
                 	ooStreams[whoseTurn].writeObject("msg#action.capture.troop_cant_capture");
                 	return;
                 }
@@ -298,7 +302,7 @@ public class Server {
             		return;
             	}
             	
-            	int code = world.createTroopByName(parameters[1].toLowerCase(), 1, x, y);
+            	int code = world.createTroopByName(parameters[1].toLowerCase(), whoseTurn, x, y);
             	switch (code) {
             	case 0:
             		ooStreams[whoseTurn].writeObject("msg#action.deploy.success");
@@ -321,27 +325,25 @@ public class Server {
                 y = coords[1];
                 if (world.troopAt(x, y)) {
                     troop = world.troop(x, y);
-                    ooStreams[whoseTurn].writeObject("cmd#startTextBlock");
                     ooStreams[whoseTurn].writeObject(Console.Ansi.YELLOW_BACKGROUND);
-                    ooStreams[whoseTurn].writeObject(String.format("Stats for %s at %s:%s\n", troop.name, parameters[0], Console.Ansi.RESET));
-                    ooStreams[whoseTurn].writeObject(String.format("     Team: %s\n", troop.team ? "You" : "Enemy"));
-                    ooStreams[whoseTurn].writeObject(String.format("     Health: %.2f%%\n", troop.health*100));
-                    ooStreams[whoseTurn].writeObject(String.format("     Movement: %s/%s\n", troop.movementThisTurn, troop.movement));
-                    ooStreams[whoseTurn].writeObject(String.format("     Attack Damage: %.2f%%\n", troop.attackDmg*100));
-                    ooStreams[whoseTurn].writeObject(String.format("     Attack Absorption: %.2f%%\n", troop.dmgAbsorption*100));
-                    ooStreams[whoseTurn].writeObject(String.format("     Defense Absorption: %.2f%%\n", troop.defDmgAbsorption*100));
-                    ooStreams[whoseTurn].writeObject("cmd#endtextBlock");
+                    ooStreams[whoseTurn].writeObject(String.format("raw#Stats for %s at %s:%s", troop.name, parameters[0], Console.Ansi.RESET));
+                    ooStreams[whoseTurn].writeObject(String.format("raw#     Team: %s", troop.team == whoseTurn ? "You" : "Enemy"));
+                    ooStreams[whoseTurn].writeObject(String.format("raw#     Health: %.2f%%", troop.health*100));
+                    ooStreams[whoseTurn].writeObject(String.format("raw#     Movement: %s/%s", troop.movementThisTurn, troop.movement));
+                    ooStreams[whoseTurn].writeObject(String.format("raw#     Attack Damage: %.2f%%", troop.attackDmg*100));
+                    ooStreams[whoseTurn].writeObject(String.format("raw#     Attack Absorption: %.2f%%", troop.dmgAbsorption*100));
+                    ooStreams[whoseTurn].writeObject(String.format("raw#     Defense Absorption: %.2f%%", troop.defDmgAbsorption*100));
                 } else {
                 	ooStreams[whoseTurn].writeObject("msg#action.notroop");
                 }
                 break;
             case "commands":
-                ooStreams[whoseTurn].writeObject("cmd#startTextBlock");
-                ooStreams[whoseTurn].writeObject("List of Commands:");
-                ooStreams[whoseTurn].writeObject("    move   <origin-coords>   <destination-coords> Move a troop");
-                ooStreams[whoseTurn].writeObject("    attack <attacker-coords> <defender-coords>    Attack another troop");
-                ooStreams[whoseTurn].writeObject("    troop  <troop-coords> Get Information about a troop");
-                ooStreams[whoseTurn].writeObject("cmd#endtextBlock");
+                ooStreams[whoseTurn].writeObject("raw#List of Commands:");
+                ooStreams[whoseTurn].writeObject("raw#    move    <origin-coords>   <destination-coords> Move a troop");
+                ooStreams[whoseTurn].writeObject("raw#    attack  <attacker-coords> <defender-coords>    Attack another troop");
+				ooStreams[whoseTurn].writeObject("raw#    capture <attacker-coords> <cp-coords>          Attempt to capture a point");
+				ooStreams[whoseTurn].writeObject("raw#    deploy  <deploy-coords> <troop-name>           Attempt to deploy specified Troop at specified (owned) CP");
+                ooStreams[whoseTurn].writeObject("raw#    troop   <troop-coords> Get Information about a troop");
                 break;
             default:
                 break;

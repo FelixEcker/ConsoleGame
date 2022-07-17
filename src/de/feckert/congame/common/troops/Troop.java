@@ -29,7 +29,7 @@ public abstract class Troop implements Serializable {
 	
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	public boolean team = false;     // False = Enemy ; True = Self
+	public int team = 0;     // False = Enemy ; True = Self
 	public float health = 1.0f;      // Health of the Troop
 	public float attackDmg = 0.0f;   // How much damage the Troop deals
 	public float dmgAbsorption = 0.0f; // How much damage the Troop absorps on attacks
@@ -44,7 +44,7 @@ public abstract class Troop implements Serializable {
 	public boolean pUsed = false; // True once primary action was used, reset every round
 	public boolean sUsed = false; // True once secondary action was used, reset every round
 	
-	public Troop(boolean team) {
+	public Troop(int team) {
 		this.team = team;
 	}
 

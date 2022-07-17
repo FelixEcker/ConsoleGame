@@ -19,10 +19,7 @@ NAMES:
 
 PROTOCOL-COMMANDS
 NUMBER | NAME            | DATA  | DESCRIPTION
-0      | redraw          | World | Tells the Client to redraw the map
-1      | reqWorld        | ////  | Asks the Server to send the World Object
-2      | startTextBlock  | ////  | Tells the Client to print out all data received until block is ended
-3      | endTextBlock    | ////  | Tells the Client to stop printing out all data received
-4      | beginTurn       | ////  | Tells the Client that their turn has begun
-5      | reqInput        | ////  | Request input from Client
-6      | ready           | ////  | Tells the Server that the Client is ready
+1      | beginTurn       | ////  | Tells the Client that their turn has begun
+2      | reqInput        | ////  | Request input from Client
+3      | ready           | ////  | Tells the Server that the Client is ready
+4      | assignPlayerNum | num   | Tells a Client which Player Number he is

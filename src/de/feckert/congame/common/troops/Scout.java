@@ -8,7 +8,7 @@ import de.feckert.congame.util.ActionResult;
 import java.io.IOException;
 
 public class Scout extends Troop {
-	public Scout(boolean team) {
+	public Scout(int team) {
 		super(team);
 
 		name = "Scout";

@@ -39,8 +39,8 @@ public class Console {
 				if (!Client.world.troopAt(x,y)) {
 					if (Client.world.isFieldCP(y, x)) {
 						// Formatting, should make this look prettier some time
-						System.out.print(Ansi.RESET + (Client.world.capturePoint(x, y).owner == 0 ? Ansi.RED_BACKGROUND :
-							Client.world.capturePoint(x, y).owner == 1 ? Ansi.CYAN_BACKGROUND : Ansi.GREEN_BACKGROUND));
+						System.out.print(Ansi.RESET + (Client.world.capturePoint(x, y).owner == 2 ? Ansi.GREEN_BACKGROUND :
+							Client.world.capturePoint(x, y).owner == Client.playerNum ? Ansi.CYAN_BACKGROUND : Ansi.RED_BACKGROUND));
 						System.out.print("*");
 					} else {
 						System.out.print(ansiFormats.get(Client.world.map[y][x]));
@@ -48,7 +48,7 @@ public class Console {
 					}
 				} else {
 					System.out.print(Ansi.YELLOW);
-					System.out.print(Client.world.troop(x,y).team ? Ansi.CYAN_BACKGROUND : Ansi.RED_BACKGROUND);
+					System.out.print(Client.world.troop(x,y).team == Client.playerNum ? Ansi.CYAN_BACKGROUND : Ansi.RED_BACKGROUND);
 					System.out.print(Client.world.troop(x,y));
 				}
 			}

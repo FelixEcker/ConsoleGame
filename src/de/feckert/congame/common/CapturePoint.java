@@ -15,7 +15,7 @@ public class CapturePoint extends Troop {
 	public boolean fullHealedPostCapture;
 	
 	public CapturePoint(int owner, int x, int y, float damage) {
-		super(false);
+		super(owner);
 		this.owner = owner;
 		this.y = y;
 		this.defenseHealth = 1f;
