@@ -1,5 +1,6 @@
 package de.feckert.congame.common.troops;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 
@@ -48,7 +49,7 @@ public abstract class Troop implements Serializable {
 	}
 
 
-	public ActionResult attack(Troop target) {
+	public ActionResult attack(Troop target) throws IOException {
 		return ActionResult.INVALID;
 	}
 
@@ -56,9 +57,9 @@ public abstract class Troop implements Serializable {
 	// Thus requires seperate method; The code for damage calculation and determining the ActionResult
 	// should remain the same in all cases, the method could be overriden for extra things on attack
 	// like inflicting certain effects on the capture points as part of the attack.
-	public ActionResult attackCP(CapturePoint target) {
+	public ActionResult attackCP(CapturePoint target) throws IOException {
 		if (attacked) {
-			Console.message("troop.attack.used");
+			Server.ooStreams[Server.whoseTurn].writeObject("troop.attack.used");
 			return ActionResult.FAILED;
 		}
 		
@@ -81,8 +82,8 @@ public abstract class Troop implements Serializable {
 		if (targetCHealth <= 0 && targetDHealth <= .05) {
 			return ActionResult.POINT_CAPTURABLE;
 		}
-		
-		Console.message("attack.cp_defends");
+
+		Server.ooStreams[Server.whoseTurn].writeObject("attack.cp_defends");
 		target.defend(this);
 		
 		if (health <= 0) {

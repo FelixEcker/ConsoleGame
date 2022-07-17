@@ -15,8 +15,8 @@ public class Client {
 	public static World world;
 	public static Socket server;
 	public static PrintWriter out;
-	public static BufferedReader in;
-	public static ObjectInputStream oiStream;
+	//public static BufferedReader in;
+	public static ObjectInputStream in;
 	
 	public static JSONObject messageStrings;
 	
@@ -37,40 +37,41 @@ public class Client {
 			break;
 		}
 		out = new PrintWriter(server.getOutputStream(), true);
-		in = new BufferedReader(new InputStreamReader(server.getInputStream()));
-        oiStream = new ObjectInputStream(server.getInputStream());
+		in  = new ObjectInputStream(server.getInputStream());
 
 		out.println("cmd#ready");
         while (true) {
-        	String msg = in.readLine();
-			System.out.println(msg);
-        	String type = msg.split("#")[0];
-        	String cont = msg.split("#")[1];
-        	
-        	switch (type) {
-        	case "msg":
-        		String[] split = cont.split(";");
-        		String id = split[0];
-        		split = Arrays.copyOfRange(split, 1, split.length-1);
-        		System.out.println(String.format(fetchMessage(id), (Object[])split));
-        		break;
-        	case "raw":
-        		System.out.println(cont);
-        		break;
-        	case "cmd":
-				procCommand(cont);
-        		break;
-        	}
-        }
+			Object rmsg = in.readObject();
+			if (rmsg instanceof String) {
+				String msg = (String) rmsg;
+				String type = msg.split("#")[0];
+				String cont = msg.split("#")[1];
+
+				switch (type) {
+					case "msg":
+						String[] split = cont.split(";");
+						String id = split[0];
+						split = Arrays.copyOfRange(split, 1, split.length - 1);
+						System.out.println(String.format(fetchMessage(id), (Object[]) split));
+						break;
+					case "raw":
+						System.out.println(cont);
+						break;
+					case "cmd":
+						procCommand(cont);
+						break;
+				}
+
+			} else if (rmsg instanceof World) {
+				world = (World) rmsg;
+				Console.drawMap();
+			}
+		}
 	}
 
 	public static void procCommand(String command) throws IOException, ClassNotFoundException {
 		switch (command) {
-			case "redraw":
-				// This throws an io.OptionalDataException for the second client to receive it
-				world = (World) oiStream.readObject();
-				Console.drawMap();
-				break;
+
 		}
 	}
 	

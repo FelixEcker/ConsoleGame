@@ -2,7 +2,10 @@ package de.feckert.congame.common;
 
 import de.feckert.congame.client.Console;
 import de.feckert.congame.common.troops.Troop;
+import de.feckert.congame.server.Server;
 import de.feckert.congame.util.ActionResult;
+
+import java.io.IOException;
 
 public class CapturePoint extends Troop {
 	public int owner;
@@ -39,7 +42,7 @@ public class CapturePoint extends Troop {
 		}
 	}
 	
-	public ActionResult attack(Troop target) {
+	public ActionResult attack(Troop target) throws IOException {
 		float dealingDamage = attackDmg-target.dmgAbsorption;
 
 		if (dealingDamage <= 0) {
@@ -50,7 +53,7 @@ public class CapturePoint extends Troop {
 		if (target.health <= 0) {
 			return ActionResult.TARGET_DIED;
 		} else {
-			Console.message("attack.target_defends");
+			Server.ooStreams[Server.whoseTurn].writeObject("attack.target_defends");
 			target.defend(this);
 		}
 

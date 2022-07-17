@@ -2,7 +2,10 @@ package de.feckert.congame.common.troops;
 
 import de.feckert.congame.client.Console;
 import de.feckert.congame.common.CapturePoint;
+import de.feckert.congame.server.Server;
 import de.feckert.congame.util.ActionResult;
+
+import java.io.IOException;
 
 public class Scout extends Troop {
 	public Scout(boolean team) {
@@ -18,7 +21,7 @@ public class Scout extends Troop {
 	}
 	
 	@Override
-	public ActionResult attack(Troop target) {
+	public ActionResult attack(Troop target) throws IOException {
 		float dealingDamage = attackDmg-target.dmgAbsorption;
 
 		if (dealingDamage <= 0 || attacked) {
@@ -30,7 +33,7 @@ public class Scout extends Troop {
 		if (target.health <= 0) {
 			return ActionResult.TARGET_DIED;
 		} else {
-			Console.message("attack.target_defends");
+			Server.ooStreams[Server.whoseTurn].writeObject("msg#attack.target_defends");
 			target.defend(this);
 		}
 
@@ -42,7 +45,7 @@ public class Scout extends Troop {
 	}
 
 	@Override
-	public ActionResult attackCP(CapturePoint target) {
+	public ActionResult attackCP(CapturePoint target) throws IOException {
 		// Maybe some extra shit???
 		return super.attackCP(target);
 	}

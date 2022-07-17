@@ -1,20 +1,15 @@
 package de.feckert.congame.client;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public class Console {
-	public static HashMap<Character, String> ansiFormats = new HashMap<>();
-	public static HashMap<String, String> messages = new HashMap<>();
+	public static final Map<Character, String> ansiFormats = Map.of(
+			'#', Ansi.GREEN,
+			'~', Ansi.BLUE,
+			'^', Ansi.WHITE
+	);
 
-	static {
-		ansiFormats.put('#', Ansi.GREEN);
-		ansiFormats.put('~', Ansi.BLUE);
-		ansiFormats.put('^', Ansi.WHITE);
-
-		messages.put("attack.target_defends", "The target of your attack attacks back!");
-		messages.put("attack.cp_defends", "The Capture Point defends itself!");
-		messages.put("troop.attack.used", "You cannot attack using this troup, it has already executed an attack this round!");
-	}
 
 	/**
 	 * Prints the map to console
@@ -60,10 +55,6 @@ public class Console {
 			System.out.println(Ansi.RESET);
 		}
 		System.out.print(Ansi.RESET);
-	}
-
-	public static void message(String s) {
-		System.out.println(messages.get(s));
 	}
 
 	public static class Ansi {
