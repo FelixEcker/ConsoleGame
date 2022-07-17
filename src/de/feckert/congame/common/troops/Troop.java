@@ -59,7 +59,7 @@ public abstract class Troop implements Serializable {
 	// like inflicting certain effects on the capture points as part of the attack.
 	public ActionResult attackCP(CapturePoint target) throws IOException {
 		if (attacked) {
-			Server.ooStreams[Server.whoseTurn].writeObject("troop.attack.used");
+			Server.ooStreams[Server.whoseTurn].writeObject("msg#action.troop.attack.used");
 			return ActionResult.FAILED;
 		}
 		
@@ -83,7 +83,7 @@ public abstract class Troop implements Serializable {
 			return ActionResult.POINT_CAPTURABLE;
 		}
 
-		Server.ooStreams[Server.whoseTurn].writeObject("attack.cp_defends");
+		Server.ooStreams[Server.whoseTurn].writeObject("msg#attack.cp_defends");
 		target.defend(this);
 		
 		if (health <= 0) {
@@ -112,7 +112,7 @@ public abstract class Troop implements Serializable {
 		attacked = false;
 	}
 
-	// Contains some universal movement checks
+	// Contains some universal movement checksa
 	public boolean canTravelTo(int originX, int originY, int destX, int destY) {
 		if (!Server.world.troopAt(originX, originY)) return false;
 		if (movementThisTurn <= 0) return false;

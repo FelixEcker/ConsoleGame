@@ -1,6 +1,5 @@
 {
 	"action.attack_cp.point_capturable":"You've sunken the Point's core health to 0% and its defense health below 5%, you can now capture it!",
-	"player.troop.newhealth":"Your troop is now at %s health!\n",
 	"action.attack_cp.troopdied":"Your troop died! Capture Point is at %s core health and %s defense health\n",
 	"action.attack_cp.success":"The Capture Point is at %s core health and %s defense health\n",
 	"action.attack_cp.failed":"Attack Failed!",
@@ -27,6 +26,9 @@
 	"action.attack.no_targets":"No troop or capture point at %s",
 	"action.attack.attacker_not_yours":"Cannot attack with troop at %s, it does not belong to you!",
 	"action.attack.no_troop":"No troop at %s",
+	"action.attack.target_defends": "The target of your attack attacks back!",
+	"action.attack.cp_defends": "The Capture Point defends itself!",
+	"troop.attack.used": "You cannot attack using this troop, it has already executed an attack this round!",
 	"action.move.wish_attack":"Attack this troop?",
 	"action.move.field_occupied":"A Troop is already on this field!",
 	"action.move.distance_too_far":"Distance too far for troop to move!",
@@ -42,5 +44,6 @@
 	"opplayer.cp.att_success":"Your enemy successfully attacked the Capture Point at %s,\n it is at %s core health and %s defense health!\n",
 	"opplayer.cp.att_success2":"The attacking troops health is now at %s!\n",
 	"opplayer.cp.att_fail":"Your enemy attempted to attack the Capture Point at %s but failed!\n",
-	"opplayer.enemy.deployed_troop":"Your enemy deployed a %s troop at %s!\n"
+	"opplayer.enemy.deployed_troop":"Your enemy deployed a %s troop at %s!\n",
+	"player.troop.newhealth":"Your troop is now at %s health!\n"
 }

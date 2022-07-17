@@ -33,7 +33,7 @@ public class Scout extends Troop {
 		if (target.health <= 0) {
 			return ActionResult.TARGET_DIED;
 		} else {
-			Server.ooStreams[Server.whoseTurn].writeObject("msg#attack.target_defends");
+			Server.ooStreams[Server.whoseTurn].writeObject("msg#action.attack.target_defends");
 			target.defend(this);
 		}
 
