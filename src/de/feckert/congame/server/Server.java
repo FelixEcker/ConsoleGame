@@ -48,7 +48,7 @@ public class Server {
 			for (int i = 0; i < clients.length; i++) {
 				clients[i] = socket.accept();
 				ooStreams[i]     = new ObjectOutputStream(clients[i].getOutputStream());
-				clientWriter[i]  = new PrintWriter(new OutputStreamWriter(clients[i].getOutputStream()));
+				clientWriter[i]  = new PrintWriter(new OutputStreamWriter(clients[i].getOutputStream()), true);
 				clientReader[i]  = new BufferedReader(new InputStreamReader(clients[i].getInputStream()));
 				logger.infof("Accepted client %s\n", i);
 			}
@@ -69,7 +69,13 @@ public class Server {
 		world.generate(12, 12);
 		logger.info("World generated, starting game!");
 
+		// Wait until both clients ready
+		for (int i = 0; i < clients.length; i++) {
+			if (clientReader[i].readLine().matches("cmd#ready")) continue;
+		}
+
 		int lastTurn = whoseTurn;
+		redrawWorld(); // Send initial World to Clients
 		while (world.winningPlayer() == -1) {
 			clientWriter[whoseTurn].println("cmd#beginTurn");
 			while (whoseTurn == lastTurn) {

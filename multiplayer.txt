@@ -25,3 +25,4 @@ NUMBER | NAME            | DATA  | DESCRIPTION
 3      | endTextBlock    | ////  | Tells the Client to stop printing out all data received
 4      | beginTurn       | ////  | Tells the Client that their turn has begun
 5      | reqInput        | ////  | Request input from Client
+6      | ready           | ////  | Tells the Server that the Client is ready

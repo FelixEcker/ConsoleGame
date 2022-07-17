@@ -1,5 +1,6 @@
 package de.feckert.congame.common.troops;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import de.feckert.congame.client.Console;
@@ -10,7 +11,7 @@ import de.feckert.congame.util.ActionResult;
 /**
  * Base Class for all Troops.
  * */
-public abstract class Troop {
+public abstract class Troop implements Serializable {
 	public static final ArrayList<String> NAMES = new ArrayList<>();
 	
 	static {
