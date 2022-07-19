@@ -7,9 +7,8 @@ import java.io.Serializable;
 
 public class World implements Serializable {
 	public char[][] map;
-
-	public CapturePoint[][]     capturePoints;
-	public Troop[][]   troops;
+	public CapturePoint[][] capturePoints;
+	public Troop[][] troops;
 	
 	public World() {
 	}
@@ -19,6 +18,7 @@ public class World implements Serializable {
 		troops        = new Troop[height][width];
 		capturePoints = new CapturePoint[height][width];
 		capturePoints[2][2] = new CapturePoint(1, 2, 2, .3f);
+		capturePoints[4][3] = new CapturePoint(0, 3, 4, .3f);
 		map = new char[][]{ // I need to make a map gen
 				{'#', '#', '~', '~', '^', '^', '^', '#', '~', '#', '^', '#'},
 				{'#', '#', '#', '~', '~', '^', '^', '#', '~', '^', '^', '#'},
@@ -144,7 +144,7 @@ public class World implements Serializable {
 				return 2;
 			}
 			
-			placeTroop(temp, x, y);
+			if (placeTroop(temp, x, y)) return 0;
 			break;
 		default:
 			System.err.println(World.class.getClass().getName()+"#createTroopByName switch statement defaulted! Something went wrong; Invalid troop name passed through check!");
@@ -152,7 +152,7 @@ public class World implements Serializable {
 			break;
 		}
 		
-		return 0;
+		return 2;
 	}
 	
 	// THERE HAS TO BE A BETTER WAY TO DO THIS

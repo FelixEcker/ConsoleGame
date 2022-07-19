@@ -126,10 +126,16 @@ public class Server {
                 break;
             case "move":
             	int[] coords;
+
+				if (parameters.length != 2) {
+					ooStreams[whoseTurn].writeObject("msg#action.move.missing_parameters");
+					return;
+				}
+
             	coords = translateCoordinates(parameters[0]);
                 int originX = coords[0];
                 int originY = coords[1];
-                if (!world.troopAt(originX, originY)) {ooStreams[whoseTurn].writeObject("msg#action.move.no_troop");}
+                if (!world.troopAt(originX, originY)) {ooStreams[whoseTurn].writeObject("msg#action.no_troop");}
                 Troop troop = world.troop(originX, originY);
 
             	coords = translateCoordinates(parameters[1]);
@@ -159,6 +165,12 @@ public class Server {
             	// NOTE FOR ATTACKING CAPTURE POINTS: Attacking a CP should never capture them
             	// to capture one, the "capture" action is to be used, which can intern attack
             	// a capture point.
+
+				if (parameters.length != 2) {
+					ooStreams[whoseTurn].writeObject("msg#action.attack.missing_parameters");
+					return;
+				}
+
                 // Attacker
             	coords = translateCoordinates(parameters[0]);
                 int attX = coords[0];
@@ -237,6 +249,11 @@ public class Server {
                 redrawMapPostAction = true;
                 break;
             case "capture":
+				if (parameters.length != 2) {
+					ooStreams[whoseTurn].writeObject("msg#action.capture.missing_parameters");
+					return;
+				}
+
             	coords = translateCoordinates(parameters[0]);
                 int x = coords[0];
                 int y = coords[1];
@@ -288,6 +305,11 @@ public class Server {
                 
             	break;
             case "deploy":
+				if (parameters.length != 2) {
+					ooStreams[whoseTurn].writeObject("msg#action.deploy.missing_parameters");
+					return;
+				}
+
             	coords = translateCoordinates(parameters[0]);
             	x = coords[0];
             	y = coords[1];
@@ -297,7 +319,7 @@ public class Server {
             	}
             	
             	cp = world.capturePoint(x,y);
-            	if (cp.owner != 1) {
+            	if (cp.owner != whoseTurn) {
             		ooStreams[whoseTurn].writeObject("msg#action.deploy.capture_point_unowned");
             		return;
             	}
@@ -307,7 +329,7 @@ public class Server {
             	case 0:
             		ooStreams[whoseTurn].writeObject("msg#action.deploy.success");
             		ooStreams[oppositePlayer].writeObject(
-            				String.format("msg#opplayer.enemy.deployed_troop;%s;%s", parameters[1].toLowerCase(), parameters[0]));
+            				String.format("msg#opplayer.enemy.deployed_troop;%s;%s", parameters[1].toLowerCase().replace(";", ":"), parameters[0]));
             		break;
             	case 1:
             		ooStreams[whoseTurn].writeObject("msg#action.deploy.invalid_troop");
@@ -320,13 +342,17 @@ public class Server {
             	// TODO: Cost dedeuctionasnoa
             	break;
             case "troop": // Prints out information/stats of a troop at x,y coordinates
+				if (parameters.length == 0) {
+					ooStreams[whoseTurn].writeObject("msg#action.troop.missing_parameters");
+					return;
+				}
+
             	coords = translateCoordinates(parameters[0]);
                 x = coords[0];
                 y = coords[1];
                 if (world.troopAt(x, y)) {
                     troop = world.troop(x, y);
-                    ooStreams[whoseTurn].writeObject(Console.Ansi.YELLOW_BACKGROUND);
-                    ooStreams[whoseTurn].writeObject(String.format("raw#Stats for %s at %s:%s", troop.name, parameters[0], Console.Ansi.RESET));
+                    ooStreams[whoseTurn].writeObject(String.format("raw#Stats for %s at %s:", troop.name, parameters[0]));
                     ooStreams[whoseTurn].writeObject(String.format("raw#     Team: %s", troop.team == whoseTurn ? "You" : "Enemy"));
                     ooStreams[whoseTurn].writeObject(String.format("raw#     Health: %.2f%%", troop.health*100));
                     ooStreams[whoseTurn].writeObject(String.format("raw#     Movement: %s/%s", troop.movementThisTurn, troop.movement));
@@ -334,7 +360,7 @@ public class Server {
                     ooStreams[whoseTurn].writeObject(String.format("raw#     Attack Absorption: %.2f%%", troop.dmgAbsorption*100));
                     ooStreams[whoseTurn].writeObject(String.format("raw#     Defense Absorption: %.2f%%", troop.defDmgAbsorption*100));
                 } else {
-                	ooStreams[whoseTurn].writeObject("msg#action.notroop");
+                	ooStreams[whoseTurn].writeObject("msg#action.no_troop");
                 }
                 break;
             case "commands":
@@ -345,6 +371,9 @@ public class Server {
 				ooStreams[whoseTurn].writeObject("raw#    deploy  <deploy-coords> <troop-name>           Attempt to deploy specified Troop at specified (owned) CP");
                 ooStreams[whoseTurn].writeObject("raw#    troop   <troop-coords> Get Information about a troop");
                 break;
+			case "testCommand":
+				// leave this here for testing in future
+				break;
             default:
                 break;
         }
@@ -415,10 +444,18 @@ public class Server {
     }
     
     public static int[] translateCoordinates(String raw) {
-    	return new int[] {
-    			 Integer.parseInt(raw.split(";")[0]),
-                 ((byte) raw.split(";")[1].toCharArray()[0]) - 65
-    	};
+		try {
+			return new int[]{
+					Integer.parseInt(raw.split(";")[0]),
+					((byte) raw.split(";")[1].toCharArray()[0]) - 65
+			};
+		} catch (ArrayIndexOutOfBoundsException | NumberFormatException e) {
+			logger.errf("Invalid format for translating coordinates: %s\n", raw);
+			return new int[]{
+					-1,
+					-1
+			};
+		}
     }
 
     public static boolean chooseYesNo() {
@@ -447,6 +484,7 @@ public class Server {
     
     public static void redrawWorld() throws IOException {
     	for (int i = 0; i < clients.length; i++) {
+			ooStreams[i].reset();
     		ooStreams[i].writeObject(world);
     	}
     }

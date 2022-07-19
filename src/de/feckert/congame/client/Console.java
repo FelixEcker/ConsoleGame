@@ -37,7 +37,7 @@ public class Console {
 			System.out.print((char) (65+y) + " "); // Print row char
 			for (int x = 0; x < Client.world.map[y].length; x++) {
 				if (!Client.world.troopAt(x,y)) {
-					if (Client.world.isFieldCP(y, x)) {
+					if (Client.world.isFieldCP(x, y)) {
 						// Formatting, should make this look prettier some time
 						System.out.print(Ansi.RESET + (Client.world.capturePoint(x, y).owner == 2 ? Ansi.GREEN_BACKGROUND :
 							Client.world.capturePoint(x, y).owner == Client.playerNum ? Ansi.CYAN_BACKGROUND : Ansi.RED_BACKGROUND));

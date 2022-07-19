@@ -2,12 +2,12 @@ package de.feckert.congame.client;
 
 import java.io.*;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Scanner;
 
+import de.feckert.congame.common.troops.Scout;
 import org.json.JSONObject;
 
 import de.feckert.congame.common.World;
@@ -52,8 +52,12 @@ public class Client {
 					case "msg":
 						String[] split = cont.split(";");
 						String id = split[0];
-						split = Arrays.copyOfRange(split, 1, split.length - 1);
-						System.out.println(String.format(fetchMessage(id), (Object[]) split));
+						if (split.length > 1) {
+							split = Arrays.copyOfRange(split, 1, split.length - 1);
+							System.out.println(String.format(fetchMessage(id), (Object[]) split));
+						} else {
+							System.out.println(fetchMessage(id));
+						}
 						break;
 					case "raw":
 						System.out.println(cont);
