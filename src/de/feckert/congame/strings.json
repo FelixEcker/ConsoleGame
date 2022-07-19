@@ -8,9 +8,9 @@
 	"action.attack_cp.failed":"Attack Failed!",
 	"action.attack_cp.failed2":"Your troop is now at %s health!\n",
 	"action.deploy.missing_parameters": "The Action \"deploy\" requires the parameters <deploy_coordinates> <troop_type>",
-	"action.deploy.no_valid_field":"Could not find a Valid field around the Capture Point to deploy your troop!",
+	"action.deploy.no_free_factory":"The Capture Point does not have free factories at the moment!",
 	"action.deploy.invalid_troop":"There is no Troop by that name!",
-	"action.deploy.success":"Deployed Troop!",
+	"action.deploy.success":"Started production for Troop!",
 	"action.deploy.capture_point_unowned":"Can't deploy troop here; Capture Point does not belong to you!",
 	"action.deploy.field_not_cp":"Can't deploy troop here; Field is not a Capture Point!",
 	"action.capture.missing_parameters": "The Action \"capture\" requires the parameters <attacker_coordinates> <cp_coordinates>",
@@ -49,5 +49,8 @@
 	"opplayer.cp.att_fail":"Your enemy attempted to attack the Capture Point at %s but failed!\n",
 	"opplayer.enemy.deployed_troop":"Your enemy deployed a %s troop at %s!\n",
 	"player.troop.newhealth":"Your troop is now at %s health!\n",
+	"player.production.finished":"Your production of a %s troop at %s finished and was deployed!",
+	"player.production.finished_deploy_failed":"Your production of a %s troop at %s finished, but it could not be deployed!",
+	"player.production.finished_deploy_failed.nvf":"Your production of a %s troop at %s finished, but it could not be deployed because there is no free field!",
 	"troop.attack.used": "You cannot attack using this troop, it has already executed an attack this round!"
 }

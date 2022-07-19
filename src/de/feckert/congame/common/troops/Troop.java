@@ -121,6 +121,10 @@ public abstract class Troop implements Serializable {
 		return true;
 	}
 
+	public boolean canAttack(int x, int y, int tX, int tY) {
+		return false;
+	}
+
 	public String toString() {
 		return ""+displayChar;
 	}

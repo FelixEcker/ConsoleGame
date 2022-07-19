@@ -4,8 +4,10 @@ import de.feckert.congame.client.Console;
 import de.feckert.congame.common.troops.Troop;
 import de.feckert.congame.server.Server;
 import de.feckert.congame.util.ActionResult;
+import de.feckert.congame.util.FactoryHelper;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 public class CapturePoint extends Troop {
 	public int owner;
@@ -13,7 +15,12 @@ public class CapturePoint extends Troop {
 	public float defenseDmg;
 	public int x, y;
 	public boolean fullHealedPostCapture;
-	
+
+	public int nFactories = 10;
+	public int factoriesInUse = 0;
+	public String[] factoryProductions;
+	public int[] factoryProgress;
+
 	public CapturePoint(int owner, int x, int y, float damage) {
 		super(owner);
 		this.owner = owner;
@@ -24,6 +31,13 @@ public class CapturePoint extends Troop {
 		this.defenseDmg = damage/2;
 		this.movement = 0;
 		this.x = x;
+
+		this.factoryProgress = new int[nFactories];
+		this.factoryProductions = new String[nFactories];
+		for (int i = 0; i < nFactories; i++) { // initialise arrays to avoid errors
+			factoryProductions[i] = "";
+			factoryProgress[i] = 0;
+		}
 	}
 	
 	public void captured(int newOwner) {
@@ -66,24 +80,49 @@ public class CapturePoint extends Troop {
 	
 	public void update() {
 		// Healing logic according to scraps.txt (See "Capture Points")
-		if (defenseHealth != 1f) {
-			if (!fullHealedPostCapture) {
-				defenseHealth += .2f;
-				if (defenseHealth >= 1f) {
-					defenseHealth = 1f;
-					fullHealedPostCapture = true;
+		if (factoriesInUse < nFactories) {
+			if (defenseHealth != 1f) {
+				if (!fullHealedPostCapture) {
+					defenseHealth += .2f;
+					if (defenseHealth >= 1f) {
+						defenseHealth = 1f;
+						fullHealedPostCapture = true;
+					}
+				} else {
+					defenseHealth += .1f;
+					if (defenseHealth >= 1f) defenseHealth = 1f;
 				}
-			} else {
-				defenseHealth += .1f;
-				if (defenseHealth >= 1f)defenseHealth = 1f;
+			}
+
+			if (health != 1f) {
+				if (health > .85f) health += .075f;
+				if (health < .85f) health += .15f;
+				if (health > 1f) health = 1f;
 			}
 		}
-		
-		if (health != 1f) {
-			if (health > .85f) health += .075f;
-			if (health < .85f) health += .15f;
-			if (health > 1f) health = 1f;
+
+		if (factoriesInUse != 0) {
+			for (int i = 0; i < nFactories; i++) {
+				String production  = factoryProductions[i];
+				if (production.matches("")) continue;
+
+				int progress = factoryProgress[i];
+				FactoryHelper.update(Server.world, this, i, production, progress);
+			}
 		}
+	}
+
+	public boolean addProduction(String production) {
+		if (factoriesInUse >= nFactories) return false;
+		for (int i = 0; i < nFactories; i++) { // Find free factory and make it busy
+			if (!factoryProductions[i].matches("")) continue;
+			factoryProductions[i] = production;
+			factoryProgress[i] = 0;
+			break;
+		}
+
+		factoriesInUse++;
+		return true;
 	}
 	
 	public static boolean capturable(CapturePoint cp) {

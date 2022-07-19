@@ -15,6 +15,7 @@ import de.feckert.congame.common.CapturePoint;
 import de.feckert.congame.common.World;
 import de.feckert.congame.common.troops.Troop;
 import de.feckert.congame.util.ActionResult;
+import de.feckert.congame.util.FactoryHelper;
 import de.feckert.congame.util.Logger;
 
 public class Server {
@@ -103,7 +104,9 @@ public class Server {
 			}
 			ooStreams[oppositePlayer].writeObject("cmd#endTurn");
 			lastTurn = whoseTurn;
-			
+
+			world.updateWorld();
+
 			roundNumber++;
 			broadcast("Round: "+roundNumber);
 		}
@@ -275,7 +278,7 @@ public class Server {
                 }
                 CapturePoint cp = world.capturePoint(pX, pY);
 
-                if (troop.canTravelTo(x, y, pX, pY)) {
+                if (troop.canAttack(x, y, pX, pY)) {
                 	if (CapturePoint.capturable(cp)) {
                 		redrawMapPostAction = true;
                 		int prevOwner = cp.owner;
@@ -324,21 +327,17 @@ public class Server {
             		return;
             	}
             	
-            	int code = world.createTroopByName(parameters[1].toLowerCase(), whoseTurn, x, y);
-            	switch (code) {
-            	case 0:
-            		ooStreams[whoseTurn].writeObject("msg#action.deploy.success");
-            		ooStreams[oppositePlayer].writeObject(
-            				String.format("msg#opplayer.enemy.deployed_troop;%s;%s", parameters[1].toLowerCase().replace(";", ":"), parameters[0]));
-            		break;
-            	case 1:
-            		ooStreams[whoseTurn].writeObject("msg#action.deploy.invalid_troop");
-            		break;
-            	case 2:
-            		ooStreams[whoseTurn].writeObject("msg#action.deploy.no_valid_field");
-            		break;
-            	}
-            	redrawMapPostAction = true;
+				if (FactoryHelper.productionDurations.containsKey(parameters[1].toLowerCase())) {
+					if (cp.addProduction(parameters[1].toLowerCase())) {
+						ooStreams[whoseTurn].writeObject("msg#action.deploy.success");
+					} else {
+						ooStreams[whoseTurn].writeObject("msg#action.deploy.no_free_factory");
+					}
+				} else {
+					ooStreams[whoseTurn].writeObject("msg#action.deploy.invalid_troop");
+					return;
+				}
+
             	// TODO: Cost dedeuctionasnoa
             	break;
             case "troop": // Prints out information/stats of a troop at x,y coordinates
@@ -440,7 +439,7 @@ public class Server {
     }
     
     public static String coordString(int x, int y) {
-    	return x+";"+((char) 65+y);
+    	return x+";"+Character.valueOf((char) (65+y));
     }
     
     public static int[] translateCoordinates(String raw) {

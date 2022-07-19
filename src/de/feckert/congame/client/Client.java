@@ -53,7 +53,7 @@ public class Client {
 						String[] split = cont.split(";");
 						String id = split[0];
 						if (split.length > 1) {
-							split = Arrays.copyOfRange(split, 1, split.length - 1);
+							split = Arrays.copyOfRange(split, 1, split.length);
 							System.out.println(String.format(fetchMessage(id), (Object[]) split));
 						} else {
 							System.out.println(fetchMessage(id));

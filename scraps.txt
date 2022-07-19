@@ -1,11 +1,11 @@
 Scrap file for Game Ideas & Bugs (Crappy design doc)
 
 General Todo:
-	- Implement checking for player wins after one player finishes turn
-	- Implement Enemy "AI"
-	- Maybe (really maybe, if I end up liking the game) Implement server for multiplayer
-		- Thats gonna be a seperate branch, cant be bothered to restructure the entire code
-		  to support Single & Multiplayer in one executable
+	- Implement "factories" for Control Points.
+	- Implement missing Troops
+	- Implement "path finding" for troops
+	    - This really means looking if there is any valid path for a troop
+	      to move from one point to another.
 
 Multiplayer:
 	- Text messages send as ids (e.g. "troop.attack.used")
@@ -51,6 +51,9 @@ Capture Points:
           a capture point.
 	- Capture Points can deploy Troops
 		- No Idea yet for what you need to deploy a troop or how much of it for different types
+    - Each Capture Point has 4 factories, these are in charge of repairing the CP's defenses and healing it.
+        - Deploying of a Troop also takes up 1 factory per troop for a different amount of Rounds set by the
+          troop.
 
 Troops: (These values were chosen arbitrarily, will be balanced when the game is playable)
 Artillery

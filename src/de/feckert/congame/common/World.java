@@ -106,6 +106,7 @@ public class World implements Serializable {
 		// Capture Points
 		for (int y = 0; y < capturePoints.length; y++) {
 			for (int x = 0; x < capturePoints[y].length; x++) {
+				if (!isFieldCP(x ,y)) continue;
 				capturePoints[y][x].update();
 			}
 		}
@@ -158,8 +159,8 @@ public class World implements Serializable {
 	private int[] findNewField(int x, int y, Troop temp) {
 		for (int y1 = y - 1; y1 < y + 3; y1++) {
 			for (int x1 = x - 1; x1 < x + 3; x1++) {
-				if (x1 == x && y1 == y) continue;
-				if (!troopAt(x, y) && !isFieldCP(x, y) && map[y][x] != '^' && (map[y][x] == '~' && temp.waterTravel)) {
+				if (!troopAt(x1, y1) && !isFieldCP(x1, y1) && map[y1][x1] != '^'){
+					if (map[y1][x1] == '~' && !temp.waterTravel) continue;
 					return new int[]{x1, y1};
 				}
 			}

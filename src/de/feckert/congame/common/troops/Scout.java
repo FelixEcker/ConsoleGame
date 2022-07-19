@@ -57,10 +57,13 @@ public class Scout extends Troop {
 
 	@Override
 	public boolean canTravelTo(int originX, int originY, int destX, int destY) {
-		if (super.canTravelTo(originX, originY, destX, destY)) {
-			return true;
-		} else {
-			return false;
-		}
+		return super.canTravelTo(originX, originY, destX, destY);
+	}
+
+	@Override
+	public boolean canAttack(int x, int y, int tX, int tY) {
+		// here we just need to check if the scout can travel to the coordinates
+		// of the target since the scout can not do ranged attacks
+		return canTravelTo(x, y, tX, tY);
 	}
 }
