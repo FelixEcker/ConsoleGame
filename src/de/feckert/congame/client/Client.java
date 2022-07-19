@@ -79,7 +79,7 @@ public class Client {
 			System.out.print("> ");
 			out.println(clientIn.nextLine());
 		} else if (command.startsWith("assignPlayerNum:")) {
-			playerNum = Integer.valueOf(command.split(":")[1]);
+			playerNum = Integer.parseInt(command.split(":")[1]);
 		} else {
 			System.out.printf("ERROR: Received invalid command \"%s\" from server!\n", command);
 		}

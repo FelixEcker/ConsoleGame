@@ -154,34 +154,17 @@ public class World implements Serializable {
 		
 		return 2;
 	}
-	
-	// THERE HAS TO BE A BETTER WAY TO DO THIS
-	// I REFUSE TO KEEP THIS PIECE OF CODE IN HERE
-	// BUT I CANT THINK OF A BETTER WAY RIGHT NOW
+
 	private int[] findNewField(int x, int y, Troop temp) {
-		x -= 1;
-		if (troopAt(x, y) || isFieldCP(x, y) || map[y][x] == '^' || (map[y][x] == '~' && !temp.waterTravel)) {
-			y -= 1;
-			if (troopAt(x, y) || isFieldCP(x, y) || map[y][x] == '^' || (map[y][x] == '~' && !temp.waterTravel)) {
-				x++;
-				if (troopAt(x, y) || isFieldCP(x, y) || map[y][x] == '^' || (map[y][x] == '~' && !temp.waterTravel)) {
-					x++;
-					if (troopAt(x, y) || isFieldCP(x, y) || map[y][x] == '^' || (map[y][x] == '~' && !temp.waterTravel)) {
-						y++;
-						if (troopAt(x, y) || isFieldCP(x, y) || map[y][x] == '^' || (map[y][x] == '~' && !temp.waterTravel)) {
-							y++;
-							if (troopAt(x, y) || isFieldCP(x, y) || map[y][x] == '^' || (map[y][x] == '~' && !temp.waterTravel)) {
-								x++;
-								if (troopAt(x, y) || isFieldCP(x, y) || map[y][x] == '^' || (map[y][x] == '~' && !temp.waterTravel)) {
-									x++;
-								}
-							}
-						}
-					}
+		for (int y1 = y - 1; y1 < y + 3; y1++) {
+			for (int x1 = x - 1; x1 < x + 3; x1++) {
+				if (x1 == x && y1 == y) continue;
+				if (!troopAt(x, y) && !isFieldCP(x, y) && map[y][x] != '^' && (map[y][x] == '~' && temp.waterTravel)) {
+					return new int[]{x1, y1};
 				}
 			}
 		}
-		
-		return new int[] {x,y};
+
+		return new int[] {x, y};
 	}
 }
