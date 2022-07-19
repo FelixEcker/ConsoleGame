@@ -1,0 +1,25 @@
+Multiplayer "(Crappy) Design Doc"
+
+MESSAGE PREFIXES
+raw - Raw Text (only used by broadcasts)
+msg - Message IDs with format strings
+cmd - A Command
+
+PLAYING-COMMANDS
+A Playing Command means commands that a Player sends to the server to play their turn. Each
+command message is sent as a String.
+
+NAMES:
+	- deploy
+	- capture
+	- attack
+	- move
+	- troop
+	- finish
+
+PROTOCOL-COMMANDS
+NUMBER | NAME            | DATA  | DESCRIPTION
+1      | beginTurn       | ////  | Tells the Client that their turn has begun
+2      | reqInput        | ////  | Request input from Client
+3      | ready           | ////  | Tells the Server that the Client is ready
+4      | assignPlayerNum | num   | Tells a Client which Player Number he is

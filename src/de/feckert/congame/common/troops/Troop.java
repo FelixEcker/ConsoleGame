@@ -1,16 +1,18 @@
-package de.feckert.congame.troops;
+package de.feckert.congame.common.troops;
 
+import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 
-import de.feckert.congame.CapturePoint;
-import de.feckert.congame.World;
+import de.feckert.congame.client.Console;
+import de.feckert.congame.common.CapturePoint;
+import de.feckert.congame.server.Server;
 import de.feckert.congame.util.ActionResult;
-import de.feckert.congame.util.Console;
 
 /**
  * Base Class for all Troops.
  * */
-public abstract class Troop {
+public abstract class Troop implements Serializable {
 	public static final ArrayList<String> NAMES = new ArrayList<>();
 	
 	static {
@@ -27,7 +29,7 @@ public abstract class Troop {
 	
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	public boolean team = false;     // False = Enemy ; True = Self
+	public int team = 0;     // False = Enemy ; True = Self
 	public float health = 1.0f;      // Health of the Troop
 	public float attackDmg = 0.0f;   // How much damage the Troop deals
 	public float dmgAbsorption = 0.0f; // How much damage the Troop absorps on attacks
@@ -42,12 +44,12 @@ public abstract class Troop {
 	public boolean pUsed = false; // True once primary action was used, reset every round
 	public boolean sUsed = false; // True once secondary action was used, reset every round
 	
-	public Troop(boolean team) {
+	public Troop(int team) {
 		this.team = team;
 	}
 
 
-	public ActionResult attack(Troop target) {
+	public ActionResult attack(Troop target) throws IOException {
 		return ActionResult.INVALID;
 	}
 
@@ -55,9 +57,9 @@ public abstract class Troop {
 	// Thus requires seperate method; The code for damage calculation and determining the ActionResult
 	// should remain the same in all cases, the method could be overriden for extra things on attack
 	// like inflicting certain effects on the capture points as part of the attack.
-	public ActionResult attackCP(CapturePoint target) {
+	public ActionResult attackCP(CapturePoint target) throws IOException {
 		if (attacked) {
-			Console.message("troop.attack.used");
+			Server.ooStreams[Server.whoseTurn].writeObject("msg#action.troop.attack.used");
 			return ActionResult.FAILED;
 		}
 		
@@ -80,8 +82,8 @@ public abstract class Troop {
 		if (targetCHealth <= 0 && targetDHealth <= .05) {
 			return ActionResult.POINT_CAPTURABLE;
 		}
-		
-		Console.message("attack.cp_defends");
+
+		Server.ooStreams[Server.whoseTurn].writeObject("msg#attack.cp_defends");
 		target.defend(this);
 		
 		if (health <= 0) {
@@ -110,13 +112,17 @@ public abstract class Troop {
 		attacked = false;
 	}
 
-	// Contains some universal movement checks
+	// Contains some universal movement checksa
 	public boolean canTravelTo(int originX, int originY, int destX, int destY) {
-		if (!World.troopAt(originX, originY)) return false;
+		if (!Server.world.troopAt(originX, originY)) return false;
 		if (movementThisTurn <= 0) return false;
 		if (movementDistance(originX, originY, destX, destY) > movementThisTurn) return false;
-		if (World.map[destY][destX] == '^') return false;
+		if (Server.world.map[destY][destX] == '^') return false;
 		return true;
+	}
+
+	public boolean canAttack(int x, int y, int tX, int tY) {
+		return false;
 	}
 
 	public String toString() {

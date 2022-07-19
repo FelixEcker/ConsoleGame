@@ -1,22 +1,15 @@
-package de.feckert.congame.util;
+package de.feckert.congame.client;
 
 import java.util.HashMap;
-
-import de.feckert.congame.World;
+import java.util.Map;
 
 public class Console {
-	public static HashMap<Character, String> ansiFormats = new HashMap<>();
-	public static HashMap<String, String> messages = new HashMap<>();
+	public static final Map<Character, String> ansiFormats = Map.of(
+			'#', Ansi.GREEN,
+			'~', Ansi.BLUE,
+			'^', Ansi.WHITE
+	);
 
-	static {
-		ansiFormats.put('#', Ansi.GREEN);
-		ansiFormats.put('~', Ansi.BLUE);
-		ansiFormats.put('^', Ansi.WHITE);
-
-		messages.put("attack.target_defends", "The target of your attack attacks back!");
-		messages.put("attack.cp_defends", "The Capture Point defends itself!");
-		messages.put("troop.attack.used", "You cannot attack using this troup, it has already executed an attack this round!");
-	}
 
 	/**
 	 * Prints the map to console
@@ -25,7 +18,7 @@ public class Console {
 		// Assemble "header" which is just the column numbers
 		String headerLine1 = "  ";
 		String headerLine2 = "  ";
-		for (int i = 0; i < World.map[0].length; i++) {
+		for (int i = 0; i < Client.world.map[0].length; i++) {
 			String[] num = String.valueOf(i).split("");
 			headerLine1 += num[0];
 
@@ -40,32 +33,28 @@ public class Console {
 		System.out.println(headerLine2);
 
 		// print map
-		for (int y = 0; y < World.map.length; y++) {
+		for (int y = 0; y < Client.world.map.length; y++) {
 			System.out.print((char) (65+y) + " "); // Print row char
-			for (int x = 0; x < World.map[y].length; x++) {
-				if (!World.troopAt(x,y)) {
-					if (World.isFieldCP(y, x)) {
+			for (int x = 0; x < Client.world.map[y].length; x++) {
+				if (!Client.world.troopAt(x,y)) {
+					if (Client.world.isFieldCP(x, y)) {
 						// Formatting, should make this look prettier some time
-						System.out.print(Ansi.RESET + (World.capturePoint(x, y).owner == 0 ? Ansi.RED_BACKGROUND :
-							World.capturePoint(x, y).owner == 1 ? Ansi.CYAN_BACKGROUND : Ansi.GREEN_BACKGROUND));
+						System.out.print(Ansi.RESET + (Client.world.capturePoint(x, y).owner == 2 ? Ansi.GREEN_BACKGROUND :
+							Client.world.capturePoint(x, y).owner == Client.playerNum ? Ansi.CYAN_BACKGROUND : Ansi.RED_BACKGROUND));
 						System.out.print("*");
 					} else {
-						System.out.print(ansiFormats.get(World.map[y][x]));
-						System.out.print(World.map[y][x]);
+						System.out.print(ansiFormats.get(Client.world.map[y][x]));
+						System.out.print(Client.world.map[y][x]);
 					}
 				} else {
 					System.out.print(Ansi.YELLOW);
-					System.out.print(World.troop(x,y).team ? Ansi.CYAN_BACKGROUND : Ansi.RED_BACKGROUND);
-					System.out.print(World.troop(x,y));
+					System.out.print(Client.world.troop(x,y).team == Client.playerNum ? Ansi.CYAN_BACKGROUND : Ansi.RED_BACKGROUND);
+					System.out.print(Client.world.troop(x,y));
 				}
 			}
 			System.out.println(Ansi.RESET);
 		}
 		System.out.print(Ansi.RESET);
-	}
-
-	public static void message(String s) {
-		System.out.println(messages.get(s));
 	}
 
 	public static class Ansi {
