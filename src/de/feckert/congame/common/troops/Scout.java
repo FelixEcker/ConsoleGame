@@ -1,6 +1,5 @@
 package de.feckert.congame.common.troops;
 
-import de.feckert.congame.client.Console;
 import de.feckert.congame.common.CapturePoint;
 import de.feckert.congame.server.Server;
 import de.feckert.congame.util.ActionResult;
@@ -18,6 +17,7 @@ public class Scout extends Troop {
 		defDmgAbsorption = 1/17f;
 		waterTravel = true;
 		movement = 8;
+		movementThisTurn = movement;
 	}
 	
 	@Override

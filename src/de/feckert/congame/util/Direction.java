@@ -3,7 +3,7 @@ package de.feckert.congame.util;
 /**
  * This enum is used to make path"finding" less clunky.
  * 
- * @see de.feckert.congame.common.troops.Troop#obstacleOnRoute(int, int, int, Direction) 
+ * @see de.feckert.congame.common.troops.Troop#obstacleOnRoute(int, int, int, Direction[])
  * */
 public enum Direction {
     NORTH,

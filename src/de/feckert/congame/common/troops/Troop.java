@@ -158,7 +158,7 @@ public abstract class Troop implements Serializable {
 	}
 
 	private boolean validField(int x, int y) {
-		return Server.world.map[y][x] == '^' | (Server.world.map[y][x] == '~' && !waterTravel);
+		return !(Server.world.map[y][x] == '^' || (Server.world.map[y][x] == '~' && !waterTravel));
 	}
 
 	public boolean canAttack(int x, int y, int tX, int tY) {

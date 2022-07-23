@@ -13,6 +13,7 @@ import java.util.Arrays;
 import de.feckert.congame.client.Console;
 import de.feckert.congame.common.CapturePoint;
 import de.feckert.congame.common.World;
+import de.feckert.congame.common.troops.Scout;
 import de.feckert.congame.common.troops.Troop;
 import de.feckert.congame.util.ActionResult;
 import de.feckert.congame.util.FactoryHelper;
@@ -372,6 +373,8 @@ public class Server {
                 break;
 			case "testCommand":
 				// leave this here for testing in future
+				world.placeTroop(new Scout(whoseTurn), 0, 0);
+				redrawWorld();
 				break;
             default:
                 break;
