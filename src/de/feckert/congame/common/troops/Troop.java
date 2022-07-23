@@ -8,6 +8,7 @@ import de.feckert.congame.client.Console;
 import de.feckert.congame.common.CapturePoint;
 import de.feckert.congame.server.Server;
 import de.feckert.congame.util.ActionResult;
+import de.feckert.congame.util.Direction;
 
 /**
  * Base Class for all Troops.
@@ -25,6 +26,10 @@ public abstract class Troop implements Serializable {
 	
 	public static int movementDistance(int originX, int originY, int destX, int destY) {
 		return Math.abs(destX - originX) + Math.abs(destY - originY);
+	}
+
+	public static int singleAxisDistance(int origin, int destination) {
+		return Math.abs(origin-destination);
 	}
 	
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -112,13 +117,48 @@ public abstract class Troop implements Serializable {
 		attacked = false;
 	}
 
-	// Contains some universal movement checksa
+	/**
+	 * Contains some universal movement checks.
+	 * Troops can also only travel horizontally, vertically and diagonally
+	 * This is mostly because I didnt want to implement an algorithm to determine
+	 * if there is a valid path from point a to b that isnt longer than the troops
+	 * maximum movement.
+	* */
 	public boolean canTravelTo(int originX, int originY, int destX, int destY) {
 		if (!Server.world.troopAt(originX, originY)) return false;
 		if (movementThisTurn <= 0) return false;
 		if (movementDistance(originX, originY, destX, destY) > movementThisTurn) return false;
-		if (Server.world.map[destY][destX] == '^') return false;
+		if (!validField(destX, destY)) return false;
+		if (obstacleOnRoute(originX, originY, movementDistance(originX, originY, destX, destY),
+				Direction.determineDirections(originX, originY, destX, destY))) return false;
 		return true;
+	}
+
+	/**
+	 * Checks if there is an Obstacle on a given route.
+	 *
+	 * @param originX X Coordinate of the Route's start point
+	 * @param originY Y Coordinate of the Route's start point
+	 * @param distance How long the route is
+	 * @param direction Which direction the route goes
+	 * */
+	public boolean obstacleOnRoute(int originX, int originY, int distance, Direction[] direction) {
+		int xInc = direction[1] == Direction.EAST ? 1 : direction[1] == Direction.WEST ? -1 : 0;
+		int yInc = direction[0] == Direction.SOUTH ? 1 : direction[0] == Direction.NORTH ? -1 : 0;
+
+		int x = originX;
+		int y = originY;
+		for (int i = 0; i < distance; i++) {
+			if (!validField(x, y)) return true;
+
+			x += xInc;
+			y += yInc;
+		}
+		return false;
+	}
+
+	private boolean validField(int x, int y) {
+		return Server.world.map[y][x] == '^' | (Server.world.map[y][x] == '~' && !waterTravel);
 	}
 
 	public boolean canAttack(int x, int y, int tX, int tY) {
