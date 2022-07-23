@@ -85,5 +85,5 @@ Medic
   - 12% attack absorp
   - 0% defense absorp (cant deal damage so duh)
   - movement 5
-  - primary ability: heal troup by 50% (Usable every 8 rounds)
-  - secondary ability: heall all troups in a radius of 5 fields by 10% (usable every 8 rounds)
+  - primary ability: heal troup by 50% (Usable every 10 rounds) cant be more than 5 fields away, is blocked by mountains
+  - secondary ability: heall all troups in a 5x5 field around the troop by 10% (usable every 6 rounds)

@@ -1,5 +1,8 @@
 package de.feckert.congame.common.troops;
 
+import de.feckert.congame.common.CapturePoint;
+import de.feckert.congame.util.ActionResult;
+
 public class Artillery extends Troop {
     public Artillery(int owner) {
         super(owner);
@@ -12,4 +15,5 @@ public class Artillery extends Troop {
         waterTravel = true;
         movement = 4;
     }
+
 }

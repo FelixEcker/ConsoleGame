@@ -13,6 +13,7 @@ import java.util.Arrays;
 import de.feckert.congame.client.Console;
 import de.feckert.congame.common.CapturePoint;
 import de.feckert.congame.common.World;
+import de.feckert.congame.common.troops.Medic;
 import de.feckert.congame.common.troops.Scout;
 import de.feckert.congame.common.troops.Troop;
 import de.feckert.congame.util.ActionResult;
@@ -165,6 +166,70 @@ public class Server {
                     }
                 }
                 break;
+			case "primary": // Execute Primary action of Troop
+				if (parameters.length < 1) {
+					ooStreams[whoseTurn].writeObject("msg#action.primary.missing_parameters");
+					return;
+				}
+
+				coords = translateCoordinates(parameters[0]);
+				int tX = coords[0];
+				int tY = coords[1];
+				if (!world.troopAt(tX, tY)) {
+					ooStreams[whoseTurn].writeObject("msg#action.no_troop");
+					return;
+				}
+
+				troop = world.troop(tX, tY);
+				if (troop.pUsed) {
+					ooStreams[whoseTurn].writeObject("msg#action.primary.used");
+					return;
+				}
+
+				switch (troop.primaryAction()) {
+					case SUCCESS:
+						ooStreams[whoseTurn].writeObject("msg#action.primary.success");
+						break;
+					case FAILED:
+						ooStreams[whoseTurn].writeObject("msg#action.primary.failed");
+						break;
+					case INVALID:
+						ooStreams[whoseTurn].writeObject("msg#action.primary.invalid");
+						break;
+				}
+				break;
+			case "secondary": // Execute Secondary action of Troop
+				if (parameters.length < 1) {
+					ooStreams[whoseTurn].writeObject("msg#action.secondary.missing_parameters");
+					return;
+				}
+
+				coords = translateCoordinates(parameters[0]);
+				tX = coords[0];
+				 tY = coords[1];
+				if (!world.troopAt(tX, tY)) {
+					ooStreams[whoseTurn].writeObject("msg#action.no_troop");
+					return;
+				}
+
+				troop = world.troop(tX, tY);
+				if (troop.sUsed) {
+					ooStreams[whoseTurn].writeObject("msg#action.secondary.used");
+					return;
+				}
+
+				switch (troop.secondaryAction()) {
+					case SUCCESS:
+						ooStreams[whoseTurn].writeObject("msg#action.secondary.success");
+						break;
+					case FAILED:
+						ooStreams[whoseTurn].writeObject("msg#action.secondary.failed");
+						break;
+					case INVALID:
+						ooStreams[whoseTurn].writeObject("msg#action.secondary.invalid");
+						break;
+				}
+				break;
             case "attack": // Attacks
             	// NOTE FOR ATTACKING CAPTURE POINTS: Attacking a CP should never capture them
             	// to capture one, the "capture" action is to be used, which can intern attack
@@ -374,6 +439,8 @@ public class Server {
 			case "testCommand":
 				// leave this here for testing in future
 				world.placeTroop(new Scout(whoseTurn), 0, 0);
+				world.troop(0, 0).health = .2f;
+				world.placeTroop(new Medic(whoseTurn), 1, 0);
 				redrawWorld();
 				break;
             default:

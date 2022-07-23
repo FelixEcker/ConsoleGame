@@ -79,6 +79,18 @@ public class World implements Serializable {
 		return troops[y][x];
 	}
 
+	public int[] troopCoords(Troop troop) {
+		int[] coords = {-1, -1};
+
+		for (int y = 0; y < map.length; y++) {
+			for (int x = 0; x < map[y].length; x++) {
+				if (troop(x, y) == troop) return new int[] {x, y};
+			}
+		}
+
+		return coords;
+	}
+
 	/**
 	 * Place a Troop on the Map
 	 * */
