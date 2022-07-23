@@ -19,7 +19,7 @@ public abstract class Troop implements Serializable {
 	static {
 		NAMES.add("scout");
 		NAMES.add("artillery");
-		NAMES.add("heavy artillery");
+		NAMES.add("heavyartillery");
 		NAMES.add("infantry");
 		NAMES.add("medic");
 	}

@@ -1,7 +1,6 @@
 package de.feckert.congame.common;
 
-import de.feckert.congame.common.troops.Scout;
-import de.feckert.congame.common.troops.Troop;
+import de.feckert.congame.common.troops.*;
 
 import java.io.Serializable;
 
@@ -133,26 +132,45 @@ public class World implements Serializable {
 		// 1 Invalid Troop
 		// 2 No Valid Fields
 		if (!Troop.NAMES.contains(name)) return 1;
-		
+
+		Troop temp = null;
 		switch (name) {
-		case "scout":
-			Scout temp = new Scout(team);
-			int[] newCoords = findNewField(x,y, temp);
-			x = newCoords[0];
-			y = newCoords[1];
-			
-			if (isFieldCP(x, y) || map[y][x] == '^' || (map[y][x] == '~' && !temp.waterTravel)) {
-				return 2;
-			}
-			
-			if (placeTroop(temp, x, y)) return 0;
-			break;
+			case "scout":
+				temp = new Scout(team);
+				break;
+			case "artillery":
+				temp = new Artillery(team);
+				break;
+			case "heavyartillery":
+				temp = new HeavyArtillery(team);
+				break;
+			case "infantry":
+				temp = new Infantry(team);
+				break;
+			case "medic":
+				temp = new Medic(team);
+				break;
 		default:
 			System.err.println(World.class.getClass().getName()+"#createTroopByName switch statement defaulted! Something went wrong; Invalid troop name passed through check!");
 			System.exit(-1);
 			break;
 		}
-		
+		if (temp == null) {
+			System.err.println(World.class.getClass().getName()+"#createTroopByName temporary troop variable is null after switch! This shouldnt be possible!");
+			System.exit(-1);
+		}
+
+		// Determine coords for new troop
+		int[] newCoords = findNewField(x,y, temp);
+		x = newCoords[0];
+		y = newCoords[1];
+
+		if (isFieldCP(x, y) || map[y][x] == '^' || (map[y][x] == '~' && !temp.waterTravel)) {
+			return 2;
+		}
+
+		// Place troop
+		if (placeTroop(temp, x, y)) return 0;
 		return 2;
 	}
 

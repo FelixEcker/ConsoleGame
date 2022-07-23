@@ -1,11 +1,8 @@
 Scrap file for Game Ideas & Bugs (Crappy design doc)
 
 General Todo:
-	- Implement "factories" for Control Points.
-	- Implement missing Troops
-	- Implement "path finding" for troops
-	    - This really means looking if there is any valid path for a troop
-	      to move from one point to another.
+	- Balance Troops
+	- Implement Troop actions
 
 Multiplayer:
 	- Text messages send as ids (e.g. "troop.attack.used")
