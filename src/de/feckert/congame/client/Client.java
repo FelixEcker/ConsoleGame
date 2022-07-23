@@ -29,7 +29,7 @@ public class Client {
 			conAttempts++;
 			try {
 				server = new Socket("localhost", 3103);
-			} catch (IOException e){
+			} catch (IOException e) {
 				System.out.printf("Failed to reach server (%s attempts)\r", conAttempts);
 				if (conAttempts > 10) System.exit(-1);
 				Thread.sleep(1000);
@@ -38,39 +38,46 @@ public class Client {
 			break;
 		}
 		out = new PrintWriter(server.getOutputStream(), true);
-		in  = new ObjectInputStream(server.getInputStream());
+		in = new ObjectInputStream(server.getInputStream());
 
 		out.println("cmd#ready");
-        while (true) {
-			Object rmsg = in.readObject();
-			if (rmsg instanceof String) {
-				String msg = (String) rmsg;
-				String type = msg.split("#")[0];
-				String cont = msg.split("#")[1];
 
-				switch (type) {
-					case "msg":
-						String[] split = cont.split(";");
-						String id = split[0];
-						if (split.length > 1) {
-							split = Arrays.copyOfRange(split, 1, split.length);
-							System.out.println(String.format(fetchMessage(id), (Object[]) split));
-						} else {
-							System.out.println(fetchMessage(id));
-						}
-						break;
-					case "raw":
-						System.out.println(cont);
-						break;
-					case "cmd":
-						procCommand(cont);
-						break;
+		String msg = null;
+		try {
+			while (true) {
+				Object rmsg = in.readObject();
+				if (rmsg instanceof String) {
+					msg = (String) rmsg;
+					String type = msg.split("#")[0];
+					String cont = msg.split("#")[1];
+
+					switch (type) {
+						case "msg":
+							String[] split = cont.split(";");
+							String id = split[0];
+							if (split.length > 1) {
+								split = Arrays.copyOfRange(split, 1, split.length);
+								System.out.println(String.format(fetchMessage(id), (Object[]) split));
+							} else {
+								System.out.println(fetchMessage(id));
+							}
+							break;
+						case "raw":
+							System.out.println(cont);
+							break;
+						case "cmd":
+							procCommand(cont);
+							break;
+					}
+
+				} else if (rmsg instanceof World) {
+					world = (World) rmsg;
+					Console.drawMap();
 				}
-
-			} else if (rmsg instanceof World) {
-				world = (World) rmsg;
-				Console.drawMap();
 			}
+		} catch (ArrayIndexOutOfBoundsException e) {
+			e.printStackTrace();
+			System.out.println("MSG = " + msg);
 		}
 	}
 

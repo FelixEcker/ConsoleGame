@@ -41,25 +41,32 @@ public class Medic extends Troop {
         try {
             int[] ownCoords = Server.world.troopCoords(this);
 
-            Server.ooStreams[Server.whoseTurn].writeObject("What troop do you want to heal (cant be obstructed or more than 5 fields away)");
+            // Get coordinates for healing target
+            Server.ooStreams[Server.whoseTurn].writeObject("msg#action.primary.medic.choose_target");
             String rawCoords = Server.getInput(Server.whoseTurn);
             int[] coordPair = Server.translateCoordinates(rawCoords);
             int tX = coordPair[0], tY = coordPair[1];
 
-            if (movementDistance(ownCoords[0], ownCoords[1], tX, tY) > pMaxHealDistance) {
-                Server.ooStreams[Server.whoseTurn].writeObject("msg#action.primary.medic.target_oor");
+            // Check for any errors
+            if (ownCoords[0] == -1 || ownCoords[1] == -1) { // This should realistically never happen, but I went to make sure
+                Server.broadcast("An error occured whilst executing the primary action of a medic.\n The World#troopCoords function returned the values for a unfound troop");
                 return ActionResult.FAILED;
             }
-            if (!obstacleOnRoute(ownCoords[0], ownCoords[1], pMaxHealDistance, Direction.determineDirections(ownCoords[0], ownCoords[1], tX, tY))) {
+            if (movementDistance(ownCoords[0], ownCoords[1], tX, tY) > pMaxHealDistance) { // Check if the target is in healing range
+                Server.ooStreams[Server.whoseTurn].writeObject("msg#action.primary.medic.target_oor");
+                return ActionResult.FAILED;
+            } // Check if the target is obstructed
+            if (obstacleOnRoute(ownCoords[0], ownCoords[1], pMaxHealDistance, Direction.determineDirections(ownCoords[0], ownCoords[1], tX, tY))) {
                 Server.ooStreams[Server.whoseTurn].writeObject("msg#action.primary.medic.target_obstructed");
                 return ActionResult.FAILED;
             }
 
+            // Heal
             Server.world.troop(tX, tY).health += .5f;
-            if (Server.world.troop(tX, tY).health > 1f) Server.world.troop(tX, tY).health = 1f;
+            if (Server.world.troop(tX, tY).health > 1f) Server.world.troop(tX, tY).health = 1f; // make sure not to "overheal"
 
-            Server.ooStreams[Server.whoseTurn].writeObject(String.format("msg#action.primary.medic.healed;%s;%.2f%%", rawCoords, Server.world.troop(tX, tY).health));
-            Server.ooStreams[Server.whoseTurn].writeObject(String.format("msg#opplayer.enemy_troop.healed;%s;%.2f%%", rawCoords, Server.world.troop(tX, tY).health));
+            Server.ooStreams[Server.whoseTurn].writeObject(String.format("msg#action.primary.medic.healed;%s;%.2f%%", rawCoords.replace(";", ":"), Server.world.troop(tX, tY).health*100));
+            Server.ooStreams[Server.oppositePlayer].writeObject(String.format("msg#opplayer.enemy_troop.healed;%s;%.2f%%", rawCoords.replace(";", ":"), Server.world.troop(tX, tY).health*100));
             return ActionResult.SUCCESS;
         } catch (IOException e) {
             throw new RuntimeException(e);

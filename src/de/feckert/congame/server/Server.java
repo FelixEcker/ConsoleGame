@@ -516,7 +516,7 @@ public class Server {
 		try {
 			return new int[]{
 					Integer.parseInt(raw.split(";")[0]),
-					((byte) raw.split(";")[1].toCharArray()[0]) - 65
+					((byte) raw.split(";")[1].toUpperCase().toCharArray()[0]) - 65
 			};
 		} catch (ArrayIndexOutOfBoundsException | NumberFormatException e) {
 			logger.errf("Invalid format for translating coordinates: %s\n", raw);

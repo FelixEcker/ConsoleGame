@@ -155,6 +155,8 @@ public abstract class Troop implements Serializable {
 
 			x += xInc;
 			y += yInc;
+			if (x < 0 || y < 0) break;
+			if (x > Server.world.map[0].length || y > Server.world.map.length) break;
 		}
 		return false;
 	}

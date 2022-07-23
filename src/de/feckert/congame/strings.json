@@ -41,6 +41,7 @@
 	"action.primary.failed":"The execution of the primary action failed!",
 	"action.primary.success":"The execution of the primary action succeeded!",
 	"action.primary.invalid":"The selected troop does not have a primary action!",
+	"action.primary.medic.choose_target":"What troop do you want to heal (cant be obstructed or more than 5 fields away)",
 	"action.primary.medic.target_oor":"The targeted troop is out of range!",
 	"action.primary.medic.target_obstructed":"The targeted troop is obstructed!",
 	"action.primary.medic.healed":"Healed the targeted troop at %s to %s!",
