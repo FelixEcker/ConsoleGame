@@ -5,6 +5,7 @@ import de.feckert.congame.common.troops.*;
 import java.io.Serializable;
 
 public class World implements Serializable {
+	public int width, height;
 	public char[][] map;
 	public CapturePoint[][] capturePoints;
 	public Troop[][] troops;
@@ -35,6 +36,9 @@ public class World implements Serializable {
 				{'#', '#', '#', '#', '~', '#', '#', '^', '^', '#', '#', '#'},
 				{'#', '#', '#', '#', '~', '#', '#', '#', '#', '#', '#', '#'},
 		};
+
+		width = map[0].length;
+		height = map.length;
 	}
 	
 	/**

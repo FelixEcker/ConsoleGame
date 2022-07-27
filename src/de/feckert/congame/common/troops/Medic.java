@@ -74,6 +74,37 @@ public class Medic extends Troop {
     }
 
     @Override
+    public ActionResult secondaryAction() {
+        // TODO: Do testing, cant be bothered right now
+        Troop[] troops = new Troop[25];
+        int i = 0;
+
+        int[] ownCoords = Server.world.troopCoords(this);
+        int startX = ownCoords[0]-2;
+        int startY = ownCoords[1]-2;
+        if (startX < 0) startX = 0;
+        if (startY < 0) startY = 0;
+
+        for (int y = startY ; y < startY+5; y++) {
+            for (int x = startX ; x < startX+5; x++) {
+                if (Server.world.troopAt(x ,y)) {
+                    troops[i] = Server.world.troop(x, y);
+                }
+                i++;
+            }
+        }
+
+        for (Troop troop : troops) {
+            if (troop != null) {
+                troop.health += .1f;
+                if (troop.health > 1f) troop.health = 1f;
+            }
+        }
+
+        return ActionResult.SUCCESS;
+    }
+
+    @Override
     public ActionResult attackCP(CapturePoint target) {
         return ActionResult.INVALID;
     }
