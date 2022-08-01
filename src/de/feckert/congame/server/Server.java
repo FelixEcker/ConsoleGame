@@ -403,8 +403,6 @@ public class Server {
 					ooStreams[whoseTurn].writeObject("msg#action.deploy.invalid_troop");
 					return;
 				}
-
-            	// TODO: Cost dedeuctionasnoa
             	break;
             case "troop": // Prints out information/stats of a troop at x,y coordinates
 				if (parameters.length == 0) {
@@ -433,11 +431,25 @@ public class Server {
                 ooStreams[whoseTurn].writeObject("raw#    move    <origin-coords>   <destination-coords> Move a troop");
                 ooStreams[whoseTurn].writeObject("raw#    attack  <attacker-coords> <defender-coords>    Attack another troop");
 				ooStreams[whoseTurn].writeObject("raw#    capture <attacker-coords> <cp-coords>          Attempt to capture a point");
-				ooStreams[whoseTurn].writeObject("raw#    deploy  <deploy-coords> <troop-name>           Attempt to deploy specified Troop at specified (owned) CP");
+
+        // TODO: Do testing, cant be bothered right nowooStreams[whoseTurn].writeObject("raw#    deploy  <deploy-coords> <troop-name>           Attempt to deploy specified Troop at specified (owned) CP");
                 ooStreams[whoseTurn].writeObject("raw#    troop   <troop-coords> Get Information about a troop");
                 break;
 			case "testCommand":
 				// leave this here for testing in future
+
+				// Medic Secondary test
+				for (int y1 = 3; y1 < 8; y1++) {
+					for (int x1 = 7; x1 < 12; x1++) {
+						if (y1 == 5 && x1 == 9) {
+							world.placeTroop(new Medic(whoseTurn), x1, y1);
+						} else {
+							world.placeTroop(new Scout(whoseTurn), x1, y1);
+							world.troop(x1, y1).health = .2f;
+						}
+					}
+				}
+
 				world.placeTroop(new Scout(whoseTurn), 0, 0);
 				world.troop(0, 0).health = .2f;
 				world.placeTroop(new Medic(whoseTurn), 1, 0);

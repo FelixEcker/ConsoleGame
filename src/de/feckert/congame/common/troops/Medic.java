@@ -36,6 +36,7 @@ public class Medic extends Troop {
     @Override
     public ActionResult primaryAction() {
         if (primaryCooldown != 0) return ActionResult.FAILED;
+        if (pUsed) return ActionResult.FAILED;
         pUsed = true;
 
         try {
@@ -67,6 +68,8 @@ public class Medic extends Troop {
 
             Server.ooStreams[Server.whoseTurn].writeObject(String.format("msg#action.primary.medic.healed;%s;%.2f%%", rawCoords.replace(";", ":"), Server.world.troop(tX, tY).health*100));
             Server.ooStreams[Server.oppositePlayer].writeObject(String.format("msg#opplayer.enemy_troop.healed;%s;%.2f%%", rawCoords.replace(";", ":"), Server.world.troop(tX, tY).health*100));
+
+            primaryCooldown = 10;
             return ActionResult.SUCCESS;
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -75,7 +78,10 @@ public class Medic extends Troop {
 
     @Override
     public ActionResult secondaryAction() {
-        // TODO: Do testing, cant be bothered right now
+        if (secondaryCooldown != 0) return ActionResult.FAILED;
+        if (pUsed) return ActionResult.FAILED;
+        pUsed = true;
+
         Troop[] troops = new Troop[25];
         int i = 0;
 
@@ -85,6 +91,7 @@ public class Medic extends Troop {
         if (startX < 0) startX = 0;
         if (startY < 0) startY = 0;
 
+        // Get array of troops in radius
         for (int y = startY ; y < startY+5; y++) {
             for (int x = startX ; x < startX+5; x++) {
                 if (Server.world.troopAt(x ,y)) {
@@ -94,6 +101,7 @@ public class Medic extends Troop {
             }
         }
 
+        // Heal the troops
         for (Troop troop : troops) {
             if (troop != null) {
                 troop.health += .1f;
@@ -101,6 +109,7 @@ public class Medic extends Troop {
             }
         }
 
+        secondaryCooldown = 6;
         return ActionResult.SUCCESS;
     }
 
