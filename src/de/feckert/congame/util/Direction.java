@@ -4,9 +4,10 @@ import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
- * This enum is used to make path"finding" less clunky.
- * 
- * @see de.feckert.congame.common.troops.Troop#obstacleOnRoute(int, int, int, Direction[])
+ * Enum representing Cardinal Directions, comes with several utility
+ * functions.
+ *
+ * Originally for ConsoleGame by Felix Eckert
  * */
 public enum Direction {
     NORTH,
@@ -75,10 +76,22 @@ public enum Direction {
         return pair;
     }
 
+    /**
+     * Returns true if the direction is West or East
+     *
+     * @param direction The Direction to check
+     * @return Is the direction "Horizontal"
+     * */
     public static boolean isHorizontal(Direction direction) {
         return direction == WEST || direction == EAST;
     }
 
+    /**
+     * Returns a randomly chosen direction.
+     *
+     * @param intercardinalDirections Include directions like NORTH_EAST or SOUTH_WEST in the pick
+     * @return A randomly picked direction
+     * */
     public static Direction randomDirection(boolean intercardinalDirections) {
         Direction[] directions;
         if (intercardinalDirections) {

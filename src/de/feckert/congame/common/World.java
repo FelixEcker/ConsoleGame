@@ -5,6 +5,7 @@ import de.feckert.congame.common.troops.*;
 import de.feckert.congame.util.Direction;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -59,23 +60,24 @@ public class World implements Serializable {
 
 		// Make the rivers flow
 		for (int i = 0; i < springs.length; i++) {
+			//long startTime = System.nanoTime();
 			int sx = springs[i][0], sy = springs[i][1];
 			Direction direction = Direction.randomDirection(false);
 			Random riverRandom = new Random();
 
-			System.out.printf("Spring %s direction = %s\n", i, direction);
+			//System.out.printf("Spring %s direction = %s\n", i, direction);
 
 			int cx = sx, cy = sy, startElevation = heightMap[sy][sx], fails = 0;
 			while (startElevation <= heightMap[cy][cx] && fails < 10) {
 				int ocx = cx, ocy = cy;
-				int divergence = riverRandom.nextInt(100);
-				if (divergence > 50 && divergence < 70) {
+				int divergence = riverRandom.nextInt(100); // The Divergence value is used to determine in what direction the river is to divert
+				if (divergence > 50 && divergence < 70) { // If above 50 and below 70, depending on the initial direction, go either south or east
 					if (Direction.isHorizontal(direction)) cy++;
 					if (!Direction.isHorizontal(direction)) cx++;
-				} else if (divergence >= 70) {
+				} else if (divergence >= 70) {  // If n >=70, go either north or west
 					if (Direction.isHorizontal(direction)) cy--;
 					if (!Direction.isHorizontal(direction)) cx--;
-				} else {
+				} else { // If no divergence, just continue in the initial direction
 					switch (direction) {
 						case NORTH -> cy--;
 						case SOUTH -> cy++;
@@ -84,11 +86,13 @@ public class World implements Serializable {
 					}
 				}
 
+				// Keep river in bounds
 				if (cx < 0) { cx = 0; fails++; }
 				if (cy < 0) { cy = 0; fails++; }
 				if (cx >= width) { cx = width-1; fails++; }
 				if (cy >= height) { cy = height-1; fails++; }
 
+				// Make sure for it to land on valid tiles
 				if (map[cy][cx] == '^' || map[cy][cx] == '~') {
 					cx = ocx;
 					cy = ocy;
@@ -98,12 +102,58 @@ public class World implements Serializable {
 
 				map[cy][cx] = '~';
 			}
-			if (fails == 10) System.out.println("Finished due to fails");
+			//System.out.printf("Time for %s: %s s\n", i, System.nanoTime()-startTime);
+			//if (fails == 10) System.out.println("Finished due to fails");
+		}
+
+		int nControlPoints = (int) ((width * height) * (.01));
+		int[][] locations = new int[nControlPoints][];
+
+		for (int i = 0; i < locations.length; i++) {
+			int x = 0, y = 0;
+			if (i == 0) {
+				x = ThreadLocalRandom.current().nextInt(width);
+				y = ThreadLocalRandom.current().nextInt(height);
+			} else {
+				boolean invalid = true;
+				while (invalid) {
+					invalid = false;
+					x = ThreadLocalRandom.current().nextInt(width);
+					y = ThreadLocalRandom.current().nextInt(height);
+
+					for (int j = 0; j < locations.length; j++) {
+						if (locations[j] != null && j != i) {
+							if (Troop.movementDistance(x, y, locations[j][0], locations[j][1]) < 8) {
+								invalid = true;
+							}
+						}
+					}
+				}
+			}
+
+			System.out.printf("point: %s; x: %s; y: %s\n", i, x, y);
+			locations[i] = new int[] {x,y};
+		}
+
+		System.out.print(nControlPoints);
+		for (int i = 0; i < locations.length; i++) {
+			int x = locations[i][0], y = locations[i][1];
+
+			int sx = x-1, sy = y-1;
+			if (sx < 0) sx = 0;
+			if (sy < 0) sy = 0;
+
+			// Ensure that there is space around the CP by removing all mountains
+			for (int y1 = sy; y1 < y+1 && y1 < height; y1++) {
+				for (int x1 = sx; x1 < x+1 && x1 < width; x1++) {
+					if (map[y1][x1] == '^') map[y1][x1] = landTiles[heightMap[y1][x1]];
+				}
+			}
+
+			capturePoints[y][x] = new CapturePoint(2, x, y, 1f);
 		}
 	}
 
-
-            	// TODO: Cost dedeuctionasnoa
 	/**
 	 * Checks if the given team has captured all points
 	 * */

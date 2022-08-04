@@ -25,7 +25,7 @@ public class Client {
 		for (String arg : args) {
 			if (arg.matches("testWorldGen")) {
 				world = new World();
-				world.generate(46, 26);
+				world.generate(80, 40);
 				Console.drawMap();
 				return;
 			}
