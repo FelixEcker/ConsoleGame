@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-import de.feckert.congame.client.Console;
 import de.feckert.congame.common.CapturePoint;
 import de.feckert.congame.server.Server;
 import de.feckert.congame.util.ActionResult;
@@ -13,6 +12,7 @@ import de.feckert.congame.util.Direction;
 /**
  * Base Class for all Troops.
  * */
+@SuppressWarnings("BooleanMethodIsAlwaysInverted")
 public abstract class Troop implements Serializable {
 	public static final ArrayList<String> NAMES = new ArrayList<>();
 	
@@ -27,14 +27,10 @@ public abstract class Troop implements Serializable {
 	public static int movementDistance(int originX, int originY, int destX, int destY) {
 		return Math.abs(destX - originX) + Math.abs(destY - originY);
 	}
-
-	public static int singleAxisDistance(int origin, int destination) {
-		return Math.abs(origin-destination);
-	}
 	
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	public int     team             = 0;     // False = Enemy ; True = Self
+	public int     team;                     // False = Enemy ; True = Self
 	public float   health           = 1.0f;  // Health of the Troop
 	public float   attackDmg        = 0.0f;  // How much damage the Troop deals
 	public float   dmgAbsorption    = 0.0f;  // How much damage the Troop absorps on attacks
@@ -89,7 +85,8 @@ public abstract class Troop implements Serializable {
 		}
 
 		Server.ooStreams[Server.whoseTurn].writeObject("msg#attack.cp_defends");
-		target.defend(this);
+		int[] ownCoords = Server.world.troopCoords(this);
+		target.defend(this, ownCoords[0], ownCoords[1]);
 		
 		if (health <= 0) {
 			return ActionResult.TROOP_DIED;
@@ -130,10 +127,9 @@ public abstract class Troop implements Serializable {
 		if (!Server.world.troopAt(originX, originY)) return false;
 		if (movementThisTurn <= 0) return false;
 		if (movementDistance(originX, originY, destX, destY) > movementThisTurn) return false;
-		if (!validField(destX, destY)) return false;
-		if (obstacleOnRoute(originX, originY, movementDistance(originX, originY, destX, destY),
-				Direction.determineDirections(originX, originY, destX, destY))) return false;
-		return true;
+		if (invalidField(destX, destY)) return false;
+		return !obstacleOnRoute(originX, originY, movementDistance(originX, originY, destX, destY),
+				Direction.determineDirections(originX, originY, destX, destY));
 	}
 
 	/**
@@ -151,7 +147,7 @@ public abstract class Troop implements Serializable {
 		int x = originX;
 		int y = originY;
 		for (int i = 0; i < distance; i++) {
-			if (!validField(x, y)) return true;
+			if (invalidField(x, y)) return true;
 
 			x += xInc;
 			y += yInc;
@@ -161,8 +157,8 @@ public abstract class Troop implements Serializable {
 		return false;
 	}
 
-	private boolean validField(int x, int y) {
-		return !(Server.world.map[y][x] == '^' || (Server.world.map[y][x] == '~' && !waterTravel));
+	private boolean invalidField(int x, int y) {
+		return Server.world.map[y][x] == '^' || (Server.world.map[y][x] == '~' && !waterTravel);
 	}
 
 	public boolean canAttack(int x, int y, int tX, int tY) {

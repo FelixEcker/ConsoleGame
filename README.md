@@ -19,3 +19,6 @@ The Game is controlled through different commands, these are as follows:
 * troop     <troop-coords>                         Get Information about a troop
 * primary   <troop-coords>                         Execute the primary action of the troop at given coordinates
 * secondary <troop-coords>                         Execute the secondary action of the troop at given coordinates
+
+### How to Play
+The Game is exclusively multiplayer and requires a Server to run.

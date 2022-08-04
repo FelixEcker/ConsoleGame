@@ -1,6 +1,5 @@
 package de.feckert.congame.client;
 
-import java.util.HashMap;
 import java.util.Map;
 
 public class Console {

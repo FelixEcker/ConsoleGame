@@ -25,17 +25,15 @@ public class FactoryHelper {
                     int code = world.createTroopByName(production.toLowerCase(), cp.owner, cp.x, cp.y);
                     String coordString = Server.coordString(cp.x, cp.y).toLowerCase().replace(";", ":");
                     switch (code) {
-                        case 0:
+                        case 0 -> {
                             Server.ooStreams[cp.owner].writeObject(String.format("msg#player.production.finished;%s;%s", production, coordString));
                             Server.ooStreams[cp.owner == 1 ? 0 : 1].writeObject(
                                     String.format("msg#opplayer.enemy.deployed_troop;%s;%s", production, coordString));
-                            break;
-                        case 1:
-                            Server.ooStreams[cp.owner].writeObject(String.format("msg#player.production.finished_deploy_failed;%s", production));
-                            break;
-                        case 2:
-                            Server.ooStreams[cp.owner].writeObject(String.format("msg#player.production.finished_deploy_failed.nvf;%s;%s", production, coordString));
-                            break;
+                        }
+                        case 1 ->
+                                Server.ooStreams[cp.owner].writeObject(String.format("msg#player.production.finished_deploy_failed;%s", production));
+                        case 2 ->
+                                Server.ooStreams[cp.owner].writeObject(String.format("msg#player.production.finished_deploy_failed.nvf;%s;%s", production, coordString));
                     }
                 } catch (IOException e) {
                     e.printStackTrace();

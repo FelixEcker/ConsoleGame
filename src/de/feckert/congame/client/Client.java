@@ -5,14 +5,15 @@ import java.net.Socket;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.Scanner;
 
-import de.feckert.congame.common.troops.Scout;
 import org.json.JSONObject;
 
 import de.feckert.congame.common.World;
 
 public class Client {
+	public static boolean running;
 	public static World world;
 	public static int playerNum = -1;
 	public static Socket server;
@@ -21,10 +22,11 @@ public class Client {
 	public static Scanner clientIn = new Scanner(System.in);
 	public static JSONObject messageStrings;
 	
+	@SuppressWarnings("BusyWait")
 	public static void main(String[] args) throws IOException, InterruptedException, ClassNotFoundException {
 		for (String arg : args) {
 			if (arg.matches("testWorldGen")) {
-				world = new World(80, 40);
+				world = new World(80, 46);
 				world.generate();
 				Console.drawMap();
 				return;
@@ -37,7 +39,11 @@ public class Client {
 		while (true) {
 			conAttempts++;
 			try {
-				server = new Socket("localhost", 3103);
+				System.out.print("IP> ");
+				String ip = clientIn.nextLine();
+				System.out.print("PORT> ");
+				int port  = clientIn.nextShort();
+				server = new Socket(ip, port);
 			} catch (IOException e) {
 				System.out.printf("Failed to reach server (%s attempts)\r", conAttempts);
 				if (conAttempts > 10) System.exit(-1);
@@ -53,7 +59,8 @@ public class Client {
 
 		String msg = null;
 		try {
-			while (true) {
+			running = true;
+			while (running) {
 				Object rmsg = in.readObject();
 				if (rmsg instanceof String) {
 					msg = (String) rmsg;
@@ -77,6 +84,9 @@ public class Client {
 						case "cmd":
 							procCommand(cont);
 							break;
+						case "end":
+							running = false;
+							break;
 					}
 
 				} else if (rmsg instanceof World) {
@@ -90,7 +100,7 @@ public class Client {
 		}
 	}
 
-	public static void procCommand(String command) throws IOException, ClassNotFoundException {
+	public static void procCommand(String command) {
 		if (command.matches("reqInput")) {
 			System.out.print("> ");
 			out.println(clientIn.nextLine());
@@ -104,7 +114,7 @@ public class Client {
 	public static void init() {
 		try {
 			String lines = new String(Files.readAllBytes(
-					Paths.get(Client.class.getResource("/de/feckert/congame/strings.json").getPath())));
+					Paths.get(Objects.requireNonNull(Client.class.getResource("/de/feckert/congame/strings.json")).getPath())));
 			messageStrings = new JSONObject(lines);
 		} catch (IOException | NullPointerException e) {
 			System.out.println("Failed to load message strings (expected at de.feckert.congame.strings.json)");

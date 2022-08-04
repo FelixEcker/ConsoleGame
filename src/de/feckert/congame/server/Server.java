@@ -4,13 +4,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Arrays;
 
-import de.feckert.congame.client.Console;
 import de.feckert.congame.common.CapturePoint;
 import de.feckert.congame.common.World;
 import de.feckert.congame.common.troops.Medic;
@@ -36,6 +33,21 @@ public class Server {
 	public static final Logger logger = Logger.create("CON_GAME_SERVER");
 
 	public static void main(String[] args) throws InterruptedException {
+		int width = -1, height = -1;
+		for (int i = 0; i < args.length; i++) {
+			String arg = args[i];
+
+			if ("-s".equals(arg)) {
+				i++;
+				String[] split = args[i].split("\\*");
+				width = Integer.parseInt(split[0]);
+				height = Integer.parseInt(split[1]);
+			}
+		}
+
+		if (width != -1)
+			world = new World(width, height);
+
 		logger.info("Server started!");
 		try {
 			// Setup
@@ -65,7 +77,8 @@ public class Server {
 		roundNumber = 0;
 
 		logger.info("Generating world...");
-		world = new World(12, 12);
+		if (world == null)
+			world = new World(80, 46);
 		world.generate();
 		logger.info("World generated, starting game!");
 
@@ -73,7 +86,6 @@ public class Server {
 		for (int i = 0; i < clients.length; i++) {
 			if (clientReader[i].readLine().matches("cmd#ready")) {
 				ooStreams[i].writeObject("cmd#assignPlayerNum:"+i);
-				continue;
 			}
 		}
 
@@ -187,15 +199,9 @@ public class Server {
 				}
 
 				switch (troop.primaryAction()) {
-					case SUCCESS:
-						ooStreams[whoseTurn].writeObject("msg#action.primary.success");
-						break;
-					case FAILED:
-						ooStreams[whoseTurn].writeObject("msg#action.primary.failed");
-						break;
-					case INVALID:
-						ooStreams[whoseTurn].writeObject("msg#action.primary.invalid");
-						break;
+					case SUCCESS -> ooStreams[whoseTurn].writeObject("msg#action.primary.success");
+					case FAILED -> ooStreams[whoseTurn].writeObject("msg#action.primary.failed");
+					case INVALID -> ooStreams[whoseTurn].writeObject("msg#action.primary.invalid");
 				}
 				break;
 			case "secondary": // Execute Secondary action of Troop
@@ -219,15 +225,9 @@ public class Server {
 				}
 
 				switch (troop.secondaryAction()) {
-					case SUCCESS:
-						ooStreams[whoseTurn].writeObject("msg#action.secondary.success");
-						break;
-					case FAILED:
-						ooStreams[whoseTurn].writeObject("msg#action.secondary.failed");
-						break;
-					case INVALID:
-						ooStreams[whoseTurn].writeObject("msg#action.secondary.invalid");
-						break;
+					case SUCCESS -> ooStreams[whoseTurn].writeObject("msg#action.secondary.success");
+					case FAILED -> ooStreams[whoseTurn].writeObject("msg#action.secondary.failed");
+					case INVALID -> ooStreams[whoseTurn].writeObject("msg#action.secondary.invalid");
 				}
 				break;
             case "attack": // Attacks
@@ -274,46 +274,44 @@ public class Server {
                 }
                 
                 // Execute Attack & Give attack information
-                switch (troop.attack(defender)) {
-                case SUCCESS:
-                    ooStreams[whoseTurn].writeObject(
-                    		String.format("msg#action.attack.success;%.2f%%", troop.health*100, defender.health*100));
-                	ooStreams[oppositePlayer].writeObject(
-                			String.format("msg#opplayer.troop_attacked.success;%s;%.2f%%", parameters[1], defender.health*100, troop.health*100));
-                	break;
-                case FAILED:
-                    ooStreams[whoseTurn].writeObject(
-                    		String.format("msg#action.attack.failed;%.2f%%", troop.health*100));
-                	ooStreams[oppositePlayer].writeObject(
-                			String.format("msg#opplayer.troop_attacked.failed;%s;%.2f%%", parameters[1], troop.health*100));
-                	break;
-                case INVALID:
-                    ooStreams[whoseTurn].writeObject("msg#action.attack.invalid");
-                	break;
-                case TROOP_DIED:
-                    ooStreams[whoseTurn].writeObject(
-                        			String.format("msg#action.attack.troopdied;%.2f%%",defender.health*100));
-                	ooStreams[oppositePlayer].writeObject(
-                			String.format("msg#opplayer.troop_attacked.attacker_died;%s;%.2f%%", parameters[1], defender.health*100));
-                    world.removeTroop(attX, attY);
-                	break;
-                case TARGET_DIED:
-                    world.removeTroop(defX, defY);
-                    troop.health += 0.04f; // Award health for killing
-                    if (troop.health > 1.0f) troop.health = 1.0f; // Make sure troop hasnt got more than 1.0f health
-                	ooStreams[whoseTurn].writeObject(
-                			String.format("msg#action.attack.targetdied;%.2f%%",troop.health*100));
-                	ooStreams[oppositePlayer].writeObject(
-                			String.format("msg#opplayer.troop_attacked.died;%s;%.2f%%", parameters[1], troop.health*100));
-                    break;
-				default:
-					String errln = Server.class.getClass().getName()+"#doAction (attack) switch statement defaulted! This wasn't supposed to happen!";
-					System.err.println(errln);
-					broadcast("A Server error has occured! The server is now exiting.");
-					broadcast("("+errln+")");
-					System.exit(-1);
-					break;
-                }
+				switch (troop.attack(defender)) {
+					case SUCCESS -> {
+						ooStreams[whoseTurn].writeObject(
+								String.format("msg#action.attack.success;%.2f%%", troop.health * 100, defender.health * 100));
+						ooStreams[oppositePlayer].writeObject(
+								String.format("msg#opplayer.troop_attacked.success;%s;%.2f%%", parameters[1], defender.health * 100, troop.health * 100));
+					}
+					case FAILED -> {
+						ooStreams[whoseTurn].writeObject(
+								String.format("msg#action.attack.failed;%.2f%%", troop.health * 100));
+						ooStreams[oppositePlayer].writeObject(
+								String.format("msg#opplayer.troop_attacked.failed;%s;%.2f%%", parameters[1], troop.health * 100));
+					}
+					case INVALID -> ooStreams[whoseTurn].writeObject("msg#action.attack.invalid");
+					case TROOP_DIED -> {
+						ooStreams[whoseTurn].writeObject(
+								String.format("msg#action.attack.troopdied;%.2f%%", defender.health * 100));
+						ooStreams[oppositePlayer].writeObject(
+								String.format("msg#opplayer.troop_attacked.attacker_died;%s;%.2f%%", parameters[1], defender.health * 100));
+						world.removeTroop(attX, attY);
+					}
+					case TARGET_DIED -> {
+						world.removeTroop(defX, defY);
+						troop.health += 0.04f; // Award health for killing
+						if (troop.health > 1.0f) troop.health = 1.0f; // Make sure troop hasnt got more than 1.0f health
+						ooStreams[whoseTurn].writeObject(
+								String.format("msg#action.attack.targetdied;%.2f%%", troop.health * 100));
+						ooStreams[oppositePlayer].writeObject(
+								String.format("msg#opplayer.troop_attacked.died;%s;%.2f%%", parameters[1], troop.health * 100));
+					}
+					default -> {
+						String errln = Server.class.getClass().getName() + "#doAction (attack) switch statement defaulted! This wasn't supposed to happen!";
+						System.err.println(errln);
+						broadcast("A Server error has occured! The server is now exiting.");
+						broadcast("(" + errln + ")");
+						System.exit(-1);
+					}
+				}
 
                 redrawMapPostAction = true;
                 break;
@@ -426,6 +424,15 @@ public class Server {
                 	ooStreams[whoseTurn].writeObject("msg#action.no_troop");
                 }
                 break;
+			case "cps":
+				ooStreams[whoseTurn].writeObject("raw#Capture Points");
+				for (y = 0; y < world.height; y++) {
+					for (x = 0; x < world.width; x++) {
+						if (!world.isFieldCP(x, y)) continue;
+						ooStreams[whoseTurn].writeObject("raw#"+world.capturePoint(x, y).toString());
+					}
+				}
+				break;
             case "commands":
                 ooStreams[whoseTurn].writeObject("raw#List of Commands:");
                 ooStreams[whoseTurn].writeObject("raw#    move    <origin-coords>   <destination-coords> Move a troop");
@@ -466,26 +473,25 @@ public class Server {
 			ActionResult result = attacker.attackCP(point);
 
 			switch (result) {
-				case POINT_CAPTURABLE:
+				case POINT_CAPTURABLE -> {
 					ooStreams[whoseTurn].writeObject("msg#action.point_capturable");
 					ooStreams[whoseTurn].writeObject(
 							String.format("msg#player.troop.newhealth;%.2f%%", attacker.health * 100));
 					ooStreams[oppositePlayer].writeObject(
 							String.format("msg#opplayer.cp.made_capturable;%s", coordString(defX, defY)));
 					redrawMapPostAction = true;
-					break;
-				case TROOP_DIED:
+				}
+				case TROOP_DIED -> {
 					ooStreams[whoseTurn].writeObject(
 							String.format("msg#action.attack_cp.troopdied;%.2f%%;%.2f%%", point.health * 100, point.defenseHealth * 100));
 					ooStreams[oppositePlayer].writeObject(
 							String.format("msg#opplayer.cp.att_troop_died;%s", coordString(defX, defY)));
 					ooStreams[oppositePlayer].writeObject(
 							String.format("msg#action.attack_cp.success;%.2f%%;%.2f%%", point.health * 100, point.defenseHealth * 100));
-
 					world.removeTroop(attX, attY);
 					redrawMapPostAction = true;
-					break;
-				case SUCCESS:
+				}
+				case SUCCESS -> {
 					ooStreams[whoseTurn].writeObject(
 							String.format("msg#action.attack_cp.success;%.2f%%;%.2f%%", point.health * 100, point.defenseHealth * 100));
 					ooStreams[whoseTurn].writeObject(
@@ -495,8 +501,8 @@ public class Server {
 									point.health * 100, point.defenseHealth * 100));
 					ooStreams[oppositePlayer].writeObject(
 							String.format("msg#opplayer.cp.att_success2;%.2f%%", attacker.health * 100));
-					break;
-				case FAILED:
+				}
+				case FAILED -> {
 					ooStreams[whoseTurn].writeObject("msg#action.attack_cp.failed");
 					ooStreams[whoseTurn].writeObject(
 							String.format("msg#action.attack_cp.failed2;%.2f%%", attacker.health * 100));
@@ -504,15 +510,15 @@ public class Server {
 							String.format("msg#opplayer.cp.att_failed;%s", coordString(defX, defY)));
 					ooStreams[oppositePlayer].writeObject(
 							String.format("msg#opplayer.cp.att_success2;%.2f%%", attacker.health * 100));
-					break;
-				default:
+				}
+				default -> {
 					String errln = Server.class.getClass().getName() + "#doAction -> " +
 							Server.class.getClass().getName() + "#attackCP ActionResult message switch statement defaulted! This wasn't supposed to happen!";
 					System.err.println(errln);
 					broadcast("A Server error has occured! The server is now exiting.");
 					broadcast("(" + errln + ")");
 					System.exit(-1);
-					break;
+				}
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -520,14 +526,14 @@ public class Server {
     }
     
     public static String coordString(int x, int y) {
-    	return x+";"+Character.valueOf((char) (65+y));
+    	return x+";"+ (char) (65 + y);
     }
     
     public static int[] translateCoordinates(String raw) {
 		try {
 			return new int[]{
 					Integer.parseInt(raw.split(";")[0]),
-					((byte) raw.split(";")[1].toUpperCase().toCharArray()[0]) - 65
+					((byte) raw.split(";")[1].toCharArray()[0]) - 65
 			};
 		} catch (ArrayIndexOutOfBoundsException | NumberFormatException e) {
 			logger.errf("Invalid format for translating coordinates: %s\n", raw);

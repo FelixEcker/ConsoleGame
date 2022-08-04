@@ -86,8 +86,8 @@ public class Medic extends Troop {
         int i = 0;
 
         int[] ownCoords = Server.world.troopCoords(this);
-        int startX = ownCoords[0]-2;
-        int startY = ownCoords[1]-2;
+        int startX = ownCoords[0]-(int) (Math.floor(sHealSquareLength/2));
+        int startY = ownCoords[1]-(int) (Math.floor(sHealSquareLength/2));
         if (startX < 0) startX = 0;
         if (startY < 0) startY = 0;
 

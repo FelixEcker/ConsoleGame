@@ -1,13 +1,11 @@
 package de.feckert.congame.common;
 
-import de.feckert.congame.client.Console;
 import de.feckert.congame.common.troops.Troop;
 import de.feckert.congame.server.Server;
 import de.feckert.congame.util.ActionResult;
 import de.feckert.congame.util.FactoryHelper;
 
 import java.io.IOException;
-import java.util.Arrays;
 
 public class CapturePoint extends Troop {
 	public int owner;
@@ -16,7 +14,7 @@ public class CapturePoint extends Troop {
 	public int x, y;
 	public boolean fullHealedPostCapture;
 
-	public int nFactories = 10;
+	public int nFactories = 4;
 	public int factoriesInUse = 0;
 	public String[] factoryProductions;
 	public int[] factoryProgress;
@@ -46,12 +44,12 @@ public class CapturePoint extends Troop {
 		this.health = .3f;
 		this.fullHealedPostCapture = false;
 	}
-	
+
 	public void defend(Troop attacker, int aX, int aY) {
 		if (movementDistance(x, y, aX, aY) <= 2) {
-			float dealingDamage = attackDmg-attacker.dmgAbsorption;
+			float dealingDamage = defenseDmg-attacker.dmgAbsorption;
 			if (dealingDamage > 0) {
-				attacker.health -= attackDmg;
+				attacker.health -= defenseDmg;
 			}
 		}
 	}
@@ -123,6 +121,11 @@ public class CapturePoint extends Troop {
 
 		factoriesInUse++;
 		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "Coordinates: "+Server.coordString(x, y)+", Owner: "+owner+", Defense: "+(defenseHealth*100)+"% Core Health: "+(health*100);
 	}
 	
 	public static boolean capturable(CapturePoint cp) {

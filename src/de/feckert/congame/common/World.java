@@ -1,11 +1,10 @@
 package de.feckert.congame.common;
 
-import de.feckert.congame.client.Console;
 import de.feckert.congame.common.troops.*;
+import de.feckert.congame.server.Server;
 import de.feckert.congame.util.Direction;
 
 import java.io.Serializable;
-import java.util.Arrays;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -22,13 +21,14 @@ public class World implements Serializable {
 		this.height = height;
 	}
 	
-	public void generate() throws InterruptedException {
+	public void generate() {
 		troops        = new Troop[height][width];
 		capturePoints = new CapturePoint[height][width];
 		map = new char[height][width];
 
 		long startTime = System.nanoTime();
 		// Initial Height Map
+		Server.logger.info("Worldgen -> Generating Terrain Height Map");
 		int[][] heightMap = DSquare.generateHeightMapWithBound(new Random(ThreadLocalRandom.current().nextInt()), 0.003, 3, width, height, 9);
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
@@ -37,6 +37,7 @@ public class World implements Serializable {
 		}
 
 		// Sprinkle some mountains, they only generate on tiles with height of 2
+		Server.logger.info("Worldgen -> Generating Mountains");
 		int[][] mountainMap = DSquare.generateHeightMapWithBound(new Random(ThreadLocalRandom.current().nextInt()), 0.01, 2, width, height, 4);
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
@@ -46,7 +47,8 @@ public class World implements Serializable {
 		}
 
 		// Stray some rivers
-		int[][] springs = new int[(int) ((width*height)*1/256)][2];
+		Server.logger.info("Worldgen -> Generating River Springs");
+		int[][] springs = new int[(int) ((width * height) /256)][2];
 		for (int i = 0; i < springs.length; i++) {
 			int x = 0, y = 0;
 			while (map[y][x] == '^' || map[y][x] == '~') {
@@ -58,6 +60,7 @@ public class World implements Serializable {
 		}
 
 		// Make the rivers flow
+		Server.logger.info("Worldgen -> Generating Rivers");
 		int fails = 0;
 		for (int i = 0; i < springs.length; i++) {
 			int sx = springs[i][0], sy = springs[i][1];
@@ -114,6 +117,7 @@ public class World implements Serializable {
 
 		int nControlPoints = (int) ((width * height) * (.01));
 		int[][] locations = new int[nControlPoints][];
+		boolean p1CPSelected = false, p2CPSelected = false;
 
 		for (int i = 0; i < locations.length; i++) {
 			int x = 0, y = 0;
@@ -137,7 +141,7 @@ public class World implements Serializable {
 				}
 			}
 
-			System.out.printf("point: %s; x: %s; y: %s\n", i, x, y);
+			Server.logger.infof("Worldgen -> capture point: %s; x: %s; y: %s\n", i, x, y);
 			locations[i] = new int[] {x,y};
 		}
 
@@ -156,10 +160,21 @@ public class World implements Serializable {
 				}
 			}
 
+			if (!p1CPSelected && ThreadLocalRandom.current().nextBoolean()) {
+				capturePoints[y][x] = new CapturePoint(0, x, y, 1f);
+				p1CPSelected = true;
+				continue;
+			}
+			if (!p2CPSelected && ThreadLocalRandom.current().nextBoolean()) {
+				capturePoints[y][x] = new CapturePoint(1, x, y, 1f);
+				p2CPSelected = true;
+				continue;
+			}
+
 			capturePoints[y][x] = new CapturePoint(2, x, y, 1f);
 		}
 
-		//System.out.printf("Generation took %s ms\n", (System.nanoTime()-startTime)/1000000);
+		Server.logger.infof("Generation took %s ms\n", (System.nanoTime()-startTime)/1000000);
 	}
 
 	/**
@@ -272,29 +287,15 @@ public class World implements Serializable {
 
 		Troop temp = null;
 		switch (name) {
-			case "scout":
-				temp = new Scout(team);
-				break;
-			case "artillery":
-				temp = new Artillery(team);
-				break;
-			case "heavyartillery":
-				temp = new HeavyArtillery(team);
-				break;
-			case "infantry":
-				temp = new Infantry(team);
-				break;
-			case "medic":
-				temp = new Medic(team);
-				break;
-		default:
-			System.err.println(World.class.getClass().getName()+"#createTroopByName switch statement defaulted! Something went wrong; Invalid troop name passed through check!");
-			System.exit(-1);
-			break;
-		}
-		if (temp == null) {
-			System.err.println(World.class.getClass().getName()+"#createTroopByName temporary troop variable is null after switch! This shouldnt be possible!");
-			System.exit(-1);
+			case "scout" -> temp = new Scout(team);
+			case "artillery" -> temp = new Artillery(team);
+			case "heavyartillery" -> temp = new HeavyArtillery(team);
+			case "infantry" -> temp = new Infantry(team);
+			case "medic" -> temp = new Medic(team);
+			default -> {
+				System.err.println(World.class.getClass().getName() + "#createTroopByName switch statement defaulted! Something went wrong; Invalid troop name passed through check!");
+				System.exit(-1);
+			}
 		}
 
 		// Determine coords for new troop
