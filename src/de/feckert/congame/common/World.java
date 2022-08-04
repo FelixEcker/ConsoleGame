@@ -17,19 +17,17 @@ public class World implements Serializable {
 
 	private static char[] landTiles = {'▒', '▓', '█'};
 
-	public World() {
-	}
-	
-	public void generate(int width, int height) {
+	public World(int width, int height) {
 		this.width = width;
 		this.height = height;
-
+	}
+	
+	public void generate() throws InterruptedException {
 		troops        = new Troop[height][width];
 		capturePoints = new CapturePoint[height][width];
-		capturePoints[2][2] = new CapturePoint(1, 2, 2, .3f);
-		capturePoints[4][3] = new CapturePoint(0, 3, 4, .3f);
 		map = new char[height][width];
 
+		long startTime = System.nanoTime();
 		// Initial Height Map
 		int[][] heightMap = DSquare.generateHeightMapWithBound(new Random(ThreadLocalRandom.current().nextInt()), 0.003, 3, width, height, 9);
 		for (int y = 0; y < height; y++) {
@@ -56,27 +54,30 @@ public class World implements Serializable {
 				y = ThreadLocalRandom.current().nextInt(height);
 			}
 			springs[i] = new int[]{x, y}; map[y][x] = '~';
+
 		}
 
 		// Make the rivers flow
+		int fails = 0;
 		for (int i = 0; i < springs.length; i++) {
-			//long startTime = System.nanoTime();
 			int sx = springs[i][0], sy = springs[i][1];
 			Direction direction = Direction.randomDirection(false);
 			Random riverRandom = new Random();
 
-			//System.out.printf("Spring %s direction = %s\n", i, direction);
-
-			int cx = sx, cy = sy, startElevation = heightMap[sy][sx], fails = 0;
+			int length = 0;
+			int cx = sx, cy = sy, startElevation = heightMap[sy][sx];
 			while (startElevation <= heightMap[cy][cx] && fails < 10) {
+
 				int ocx = cx, ocy = cy;
 				int divergence = riverRandom.nextInt(100); // The Divergence value is used to determine in what direction the river is to divert
 				if (divergence > 50 && divergence < 70) { // If above 50 and below 70, depending on the initial direction, go either south or east
 					if (Direction.isHorizontal(direction)) cy++;
 					if (!Direction.isHorizontal(direction)) cx++;
+					length++;
 				} else if (divergence >= 70) {  // If n >=70, go either north or west
 					if (Direction.isHorizontal(direction)) cy--;
 					if (!Direction.isHorizontal(direction)) cx--;
+					length++;
 				} else { // If no divergence, just continue in the initial direction
 					switch (direction) {
 						case NORTH -> cy--;
@@ -84,6 +85,7 @@ public class World implements Serializable {
 						case EAST -> cx++;
 						case WEST -> cx--;
 					}
+					length++;
 				}
 
 				// Keep river in bounds
@@ -102,8 +104,12 @@ public class World implements Serializable {
 
 				map[cy][cx] = '~';
 			}
-			//System.out.printf("Time for %s: %s s\n", i, System.nanoTime()-startTime);
-			//if (fails == 10) System.out.println("Finished due to fails");
+			if (length < 10 && fails < 20) {
+				i--;
+				fails++;
+				continue;
+			}
+			fails = 0;
 		}
 
 		int nControlPoints = (int) ((width * height) * (.01));
@@ -152,6 +158,8 @@ public class World implements Serializable {
 
 			capturePoints[y][x] = new CapturePoint(2, x, y, 1f);
 		}
+
+		//System.out.printf("Generation took %s ms\n", (System.nanoTime()-startTime)/1000000);
 	}
 
 	/**

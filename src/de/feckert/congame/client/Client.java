@@ -24,8 +24,8 @@ public class Client {
 	public static void main(String[] args) throws IOException, InterruptedException, ClassNotFoundException {
 		for (String arg : args) {
 			if (arg.matches("testWorldGen")) {
-				world = new World();
-				world.generate(80, 40);
+				world = new World(80, 40);
+				world.generate();
 				Console.drawMap();
 				return;
 			}

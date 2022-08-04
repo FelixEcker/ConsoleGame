@@ -35,7 +35,7 @@ public class Server {
 
 	public static final Logger logger = Logger.create("CON_GAME_SERVER");
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws InterruptedException {
 		logger.info("Server started!");
 		try {
 			// Setup
@@ -59,14 +59,14 @@ public class Server {
 		}
 	}
 	
-	public static void startGame() throws IOException {
+	public static void startGame() throws IOException, InterruptedException {
 		whoseTurn = 0;
 		oppositePlayer = 1;
 		roundNumber = 0;
 
 		logger.info("Generating world...");
-		world = new World();
-		world.generate(12, 12);
+		world = new World(12, 12);
+		world.generate();
 		logger.info("World generated, starting game!");
 
 		// Wait until both clients ready
