@@ -431,8 +431,7 @@ public class Server {
                 ooStreams[whoseTurn].writeObject("raw#    move    <origin-coords>   <destination-coords> Move a troop");
                 ooStreams[whoseTurn].writeObject("raw#    attack  <attacker-coords> <defender-coords>    Attack another troop");
 				ooStreams[whoseTurn].writeObject("raw#    capture <attacker-coords> <cp-coords>          Attempt to capture a point");
-
-        // TODO: Do testing, cant be bothered right nowooStreams[whoseTurn].writeObject("raw#    deploy  <deploy-coords> <troop-name>           Attempt to deploy specified Troop at specified (owned) CP");
+				ooStreams[whoseTurn].writeObject("raw#    deploy  <deploy-coords> <troop-name>           Attempt to deploy specified Troop at specified (owned) CP");
                 ooStreams[whoseTurn].writeObject("raw#    troop   <troop-coords> Get Information about a troop");
                 break;
 			case "testCommand":

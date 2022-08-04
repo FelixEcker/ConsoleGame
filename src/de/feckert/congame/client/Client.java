@@ -22,6 +22,15 @@ public class Client {
 	public static JSONObject messageStrings;
 	
 	public static void main(String[] args) throws IOException, InterruptedException, ClassNotFoundException {
+		for (String arg : args) {
+			if (arg.matches("testWorldGen")) {
+				world = new World();
+				world.generate(46, 26);
+				Console.drawMap();
+				return;
+			}
+		}
+
 		init();
 
 		int conAttempts = 0;

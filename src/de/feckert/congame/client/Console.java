@@ -5,9 +5,13 @@ import java.util.Map;
 
 public class Console {
 	public static final Map<Character, String> ansiFormats = Map.of(
-			'#', Ansi.GREEN,
-			'~', Ansi.BLUE,
-			'^', Ansi.WHITE
+			'█', Ansi.GREEN,
+			'▓', Ansi.GREEN,
+			'▒', Ansi.GREEN,
+			'-', Ansi.GREEN,
+			'.', Ansi.GREEN,
+			'~', Ansi.WHITE+Ansi.BLUE_BACKGROUND,
+			'^', Ansi.WHITE+Ansi.BLACK_BACKGROUND
 	);
 
 
@@ -33,9 +37,9 @@ public class Console {
 		System.out.println(headerLine2);
 
 		// print map
-		for (int y = 0; y < Client.world.map.length; y++) {
+		for (int y = 0; y < Client.world.height; y++) {
 			System.out.print((char) (65+y) + " "); // Print row char
-			for (int x = 0; x < Client.world.map[y].length; x++) {
+			for (int x = 0; x < Client.world.width; x++) {
 				if (!Client.world.troopAt(x,y)) {
 					if (Client.world.isFieldCP(x, y)) {
 						// Formatting, should make this look prettier some time

@@ -1,44 +1,105 @@
 package de.feckert.congame.common;
 
+import de.feckert.congame.client.Console;
 import de.feckert.congame.common.troops.*;
+import de.feckert.congame.util.Direction;
 
 import java.io.Serializable;
+import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class World implements Serializable {
 	public int width, height;
 	public char[][] map;
 	public CapturePoint[][] capturePoints;
 	public Troop[][] troops;
-	
+
+	private static char[] landTiles = {'▒', '▓', '█'};
+
 	public World() {
 	}
 	
 	public void generate(int width, int height) {
-		// TODO: World Generation
+		this.width = width;
+		this.height = height;
+
 		troops        = new Troop[height][width];
 		capturePoints = new CapturePoint[height][width];
 		capturePoints[2][2] = new CapturePoint(1, 2, 2, .3f);
 		capturePoints[4][3] = new CapturePoint(0, 3, 4, .3f);
-		map = new char[][]{ // I need to make a map gen
-				{'#', '#', '~', '~', '^', '^', '^', '#', '~', '#', '^', '#'},
-				{'#', '#', '#', '~', '~', '^', '^', '#', '~', '^', '^', '#'},
-				{'#', '#', '#', '#', '~', '#', '~', '~', '~', '#', '^', '#'},
+		map = new char[height][width];
 
-				{'#', '#', '#', '#', '~', '#', '~', '#', '#', '#', '#', '#'},
-				{'^', '#', '#', '#', '~', '#', '~', '#', '#', '#', '#', '#'},
-				{'#', '#', '^', '#', '~', '~', '~', '#', '#', '#', '#', '#'},
+		// Initial Height Map
+		int[][] heightMap = DSquare.generateHeightMapWithBound(new Random(ThreadLocalRandom.current().nextInt()), 0.003, 3, width, height, 9);
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
+				map[y][x] = landTiles[heightMap[y][x]];
+			}
+		}
 
-				{'#', '#', '^', '^', '~', '#', '#', '#', '#', '#', '#', '#'},
-				{'#', '#', '^', '^', '~', '#', '#', '#', '#', '#', '#', '#'},
-				{'#', '#', '#', '^', '~', '#', '#', '#', '#', '#', '#', '#'},
+		// Sprinkle some mountains, they only generate on tiles with height of 2
+		int[][] mountainMap = DSquare.generateHeightMapWithBound(new Random(ThreadLocalRandom.current().nextInt()), 0.01, 2, width, height, 4);
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
+				int cval = mountainMap[y][x];
+				if (cval == 1 && heightMap[y][x] == 2) map[y][x] = '^';
+			}
+		}
 
-				{'#', '#', '#', '#', '~', '#', '#', '^', '#', '#', '#', '#'},
-				{'#', '#', '#', '#', '~', '#', '#', '^', '^', '#', '#', '#'},
-				{'#', '#', '#', '#', '~', '#', '#', '#', '#', '#', '#', '#'},
-		};
+		// Stray some rivers
+		int[][] springs = new int[(int) ((width*height)*1/256)][2];
+		for (int i = 0; i < springs.length; i++) {
+			int x = 0, y = 0;
+			while (map[y][x] == '^' || map[y][x] == '~') {
+				x = ThreadLocalRandom.current().nextInt(width);
+				y = ThreadLocalRandom.current().nextInt(height);
+			}
+			springs[i] = new int[]{x, y}; map[y][x] = '~';
+		}
 
-		width = map[0].length;
-		height = map.length;
+		// Make the rivers flow
+		for (int i = 0; i < springs.length; i++) {
+			int sx = springs[i][0], sy = springs[i][1];
+			Direction direction = Direction.randomDirection(false);
+			Random riverRandom = new Random();
+
+			System.out.printf("Spring %s direction = %s\n", i, direction);
+
+			int cx = sx, cy = sy, startElevation = heightMap[sy][sx], fails = 0;
+			while (startElevation <= heightMap[cy][cx] && fails < 10) {
+				int ocx = cx, ocy = cy;
+				int divergence = riverRandom.nextInt(100);
+				if (divergence > 50 && divergence < 70) {
+					if (Direction.isHorizontal(direction)) cy++;
+					if (!Direction.isHorizontal(direction)) cx++;
+				} else if (divergence >= 70) {
+					if (Direction.isHorizontal(direction)) cy--;
+					if (!Direction.isHorizontal(direction)) cx--;
+				} else {
+					switch (direction) {
+						case NORTH -> cy--;
+						case SOUTH -> cy++;
+						case EAST -> cx++;
+						case WEST -> cx--;
+					}
+				}
+
+				if (cx < 0) { cx = 0; fails++; }
+				if (cy < 0) { cy = 0; fails++; }
+				if (cx >= width) { cx = width-1; fails++; }
+				if (cy >= height) { cy = height-1; fails++; }
+
+				if (map[cy][cx] == '^' || map[cy][cx] == '~') {
+					cx = ocx;
+					cy = ocy;
+					fails++;
+					continue;
+				}
+
+				map[cy][cx] = '~';
+			}
+			if (fails == 10) System.out.println("Finished due to fails");
+		}
 	}
 
 

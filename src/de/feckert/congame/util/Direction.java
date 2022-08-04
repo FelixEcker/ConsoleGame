@@ -1,5 +1,8 @@
 package de.feckert.congame.util;
 
+import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
+
 /**
  * This enum is used to make path"finding" less clunky.
  * 
@@ -70,5 +73,21 @@ public enum Direction {
         }
 
         return pair;
+    }
+
+    public static boolean isHorizontal(Direction direction) {
+        return direction == WEST || direction == EAST;
+    }
+
+    public static Direction randomDirection(boolean intercardinalDirections) {
+        Direction[] directions;
+        if (intercardinalDirections) {
+            directions = new Direction[] {NORTH, NORTH_EAST, NORTH_WEST, SOUTH, SOUTH_EAST, SOUTH_WEST, EAST, WEST};
+        } else {
+            directions = new Direction[] {NORTH, SOUTH, EAST, WEST};
+        }
+
+        Random random = new Random(ThreadLocalRandom.current().nextInt());
+        return directions[random.nextInt(directions.length)];
     }
 }
