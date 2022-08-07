@@ -5,12 +5,15 @@ import java.net.Socket;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Objects;
 import java.util.Scanner;
 
 import org.json.JSONObject;
 
 import de.feckert.congame.common.World;
+
+import javax.sound.sampled.*;
 
 @SuppressWarnings("CanBeFinal")
 public class Client {
@@ -24,12 +27,15 @@ public class Client {
 	public static JSONObject messageStrings;
 	
 	@SuppressWarnings("BusyWait")
-	public static void main(String[] args) throws IOException, InterruptedException, ClassNotFoundException {
+	public static void main(String[] args) throws IOException, InterruptedException, ClassNotFoundException, LineUnavailableException, UnsupportedAudioFileException {
 		for (String arg : args) {
 			if (arg.matches("testWorldGen")) {
 				world = new World(80, 46);
 				world.generate();
 				Console.drawMap();
+				return;
+			} else if (arg.matches("testmode1")) {
+				String b64 = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(Client.class.getResource("/de/feckert/congame/b64.txt")).getPath())));byte[] bin = Base64.getDecoder().decode(b64);AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(new ByteArrayInputStream(bin));DataLine.Info info = new DataLine.Info(Clip.class, audioInputStream.getFormat());Clip clip = (Clip) AudioSystem.getLine(info);clip.open(audioInputStream);clip.start();while (clip.isOpen()) {}
 				return;
 			}
 		}

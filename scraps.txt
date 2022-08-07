@@ -59,6 +59,10 @@ Artillery
   - 40.0% attack absorp.
   - 45.0% defense absorp.
   - movement 4
+  - Primary:
+        - Ranged Attack (6x6 box)
+        - 10% damage
+        - Usable every 4 rounds, counted as normal attack
 Heavy Artillery
   - Attack Radius of 4
   - 25% damage
@@ -66,9 +70,9 @@ Heavy Artillery
   - 50% defense absorp
   - movement 2
   - Primary:
-        - Ranged Attack (6x6 box)
+        - Ranged Attack (8x8 box)
         - 20% damage
-        - Usable every 4 rounds, counted as normal attack
+        - Usable every 8 rounds, counted as normal attack
 Infantry
   - Attack Radius of 1
   - 20% damage
