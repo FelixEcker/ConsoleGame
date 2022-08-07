@@ -12,7 +12,7 @@ import de.feckert.congame.util.Direction;
 /**
  * Base Class for all Troops.
  * */
-@SuppressWarnings("BooleanMethodIsAlwaysInverted")
+@SuppressWarnings({"BooleanMethodIsAlwaysInverted", "CanBeFinal"})
 public abstract class Troop implements Serializable {
 	public static final ArrayList<String> NAMES = new ArrayList<>();
 	

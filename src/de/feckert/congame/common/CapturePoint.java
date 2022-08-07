@@ -7,6 +7,7 @@ import de.feckert.congame.util.FactoryHelper;
 
 import java.io.IOException;
 
+@SuppressWarnings("CanBeFinal")
 public class CapturePoint extends Troop {
 	public int owner;
 	public float defenseHealth;

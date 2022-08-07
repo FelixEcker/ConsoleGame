@@ -12,6 +12,7 @@ import org.json.JSONObject;
 
 import de.feckert.congame.common.World;
 
+@SuppressWarnings("CanBeFinal")
 public class Client {
 	public static boolean running;
 	public static World world;
@@ -126,4 +127,6 @@ public class Client {
 	public static String fetchMessage(String id) {
 		return messageStrings.getString(id);
 	}
+
+	// Toan is stored in the balls, fenders dont have balls so fenders dont have toan
 }

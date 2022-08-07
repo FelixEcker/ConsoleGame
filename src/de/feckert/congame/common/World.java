@@ -8,6 +8,7 @@ import java.io.Serializable;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
+@SuppressWarnings("CanBeFinal")
 public class World implements Serializable {
 	public int width, height;
 	public char[][] map;
@@ -145,7 +146,6 @@ public class World implements Serializable {
 			locations[i] = new int[] {x,y};
 		}
 
-		System.out.print(nControlPoints);
 		for (int i = 0; i < locations.length; i++) {
 			int x = locations[i][0], y = locations[i][1];
 

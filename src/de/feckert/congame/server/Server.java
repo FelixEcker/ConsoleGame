@@ -7,6 +7,7 @@ import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Arrays;
+import java.util.Map;
 
 import de.feckert.congame.common.CapturePoint;
 import de.feckert.congame.common.World;
@@ -71,7 +72,7 @@ public class Server {
 		}
 	}
 	
-	public static void startGame() throws IOException, InterruptedException {
+	public static void startGame() throws IOException {
 		whoseTurn = 0;
 		oppositePlayer = 1;
 		roundNumber = 0;
@@ -425,6 +426,18 @@ public class Server {
                 }
                 break;
 			case "cps":
+				if (parameters.length > 0) {
+					if (!FILTER_NAME_ID.containsKey(parameters[0])) {
+						ooStreams[whoseTurn].writeObject("raw#Invalid Filter! Applicable filters are: my, enemy, owned, unowned!");
+						break;
+					}
+					String[] cps = cplist(FILTER_NAME_ID.get(parameters[0]));
+					ooStreams[whoseTurn].writeObject("raw#Capture Points");
+					for (String s : cps) {
+						ooStreams[whoseTurn].writeObject("raw#"+s);
+					}
+					break;
+				}
 				ooStreams[whoseTurn].writeObject("raw#Capture Points");
 				for (y = 0; y < world.height; y++) {
 					for (x = 0; x < world.width; x++) {
@@ -580,4 +593,38 @@ public class Server {
     		oos.writeObject("raw#"+msg);
     	}
     }
+
+	public static String[] cplist(int filter) {
+		String raw = "";
+
+		for (int y = 0; y < world.height; y++) {
+			for (int x = 0; x < world.width; x++) {
+				if (!world.isFieldCP(x, y)) continue;
+				CapturePoint cp = world.capturePoint(x, y);
+				if (matchesCPFilter(cp, filter)) raw += world.capturePoint(x, y).toString()+"?";
+			}
+		}
+
+		return raw.split("\\?");
+	}
+
+	private static final int MY_CPS = 0;
+	private static final int ENEMY_CPS = 1;
+	private static final int OWNED_CPS = 2;
+	private static final int UNOWNED_CPS = 3;
+	private static final Map<String, Integer> FILTER_NAME_ID = Map.of(
+			"my", MY_CPS,
+			"enemy", ENEMY_CPS,
+			"owned", OWNED_CPS,
+			"unowned", UNOWNED_CPS
+		);
+	private static boolean matchesCPFilter(CapturePoint cp, int filter) {
+		switch (filter) {
+			case MY_CPS -> { return cp.owner == whoseTurn; }
+			case ENEMY_CPS -> { return cp.owner == oppositePlayer; }
+			case OWNED_CPS -> { return cp.owner != 2; }
+			case UNOWNED_CPS -> { return cp.owner == 2; }
+			default -> { return false; }
+		}
+	}
 }

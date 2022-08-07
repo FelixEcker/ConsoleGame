@@ -7,6 +7,7 @@ import java.util.Random;
  *
  * @author hushoca
  * */
+@SuppressWarnings("CanBeFinal")
 public class DSquare {
 
     private static final int EMPTY = -1;

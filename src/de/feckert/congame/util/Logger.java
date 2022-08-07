@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
+@SuppressWarnings("CanBeFinal")
 public class Logger {
     protected String name;
     protected PrintStream printStream;

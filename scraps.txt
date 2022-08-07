@@ -65,12 +65,20 @@ Heavy Artillery
   - 45% attack absorp
   - 50% defense absorp
   - movement 2
+  - Primary:
+        - Ranged Attack (6x6 box)
+        - 20% damage
+        - Usable every 4 rounds, counted as normal attack
 Infantry
   - Attack Radius of 1
   - 20% damage
   - 30% attack absorp
   - 35% defense absorp
   - movement 7
+  - Primary:
+        "Last Man Standing"
+        - Damage Absorption buff (increased by 8% for 3 rounds)
+        - 6 Round cooldown
 Scout
   - Attack Radius of 1
   - 6.25% damage

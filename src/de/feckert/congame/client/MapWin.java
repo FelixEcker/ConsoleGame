@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferStrategy;
 
+@SuppressWarnings("CanBeFinal")
 public class MapWin extends JFrame implements Runnable {
     private Canvas cvs;
 
