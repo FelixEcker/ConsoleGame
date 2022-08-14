@@ -28,7 +28,10 @@ public class Client {
 	
 	@SuppressWarnings("BusyWait")
 	public static void main(String[] args) throws IOException, InterruptedException, ClassNotFoundException, LineUnavailableException, UnsupportedAudioFileException {
-		for (String arg : args) {
+		String ip = null;
+		int port = -1;
+		for (int i = 0; i < args.length; i++) {
+			String arg = args[i];
 			if (arg.matches("testWorldGen")) {
 				world = new World(80, 46);
 				world.generate();
@@ -37,19 +40,28 @@ public class Client {
 			} else if (arg.matches("testmode1")) {
 				String b64 = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(Client.class.getResource("/de/feckert/congame/b64.txt")).getPath())));byte[] bin = Base64.getDecoder().decode(b64);AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(new ByteArrayInputStream(bin));DataLine.Info info = new DataLine.Info(Clip.class, audioInputStream.getFormat());Clip clip = (Clip) AudioSystem.getLine(info);clip.open(audioInputStream);clip.start();while (clip.isOpen()) {}
 				return;
+			} else if (arg.matches("-host")) {
+				String param = args[i+1];
+				ip = param.split(":")[0];
+				port = Integer.parseInt(param.split(":")[1]);
+				i++;
 			}
 		}
 
 		init();
 
+		if (ip == null || port == -1) {
+
+			System.out.print("IP> ");
+			ip = clientIn.nextLine();
+			System.out.print("PORT> ");
+			port  = clientIn.nextShort();
+		}
+
 		int conAttempts = 0;
 		while (true) {
 			conAttempts++;
 			try {
-				System.out.print("IP> ");
-				String ip = clientIn.nextLine();
-				System.out.print("PORT> ");
-				int port  = clientIn.nextShort();
 				server = new Socket(ip, port);
 			} catch (IOException e) {
 				System.out.printf("Failed to reach server (%s attempts)\r", conAttempts);

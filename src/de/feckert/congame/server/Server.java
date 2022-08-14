@@ -46,10 +46,14 @@ public class Server {
 			}
 		}
 
-		if (width != -1)
-			world = new World(width, height);
+		if (width == -1) {
+			width = 26;
+			height = 26;
+		}
 
-		logger.info("Server started!");
+		world = new World(width, height);
+
+		logger.info("Server started! Waiting for clients...");
 		try {
 			// Setup
 			clients = new Socket[2];
